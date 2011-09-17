@@ -114,22 +114,29 @@ AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=People,dc=neuf,dc=no",
     ldap.SCOPE_ONELEVEL, "(uid=%(user)s)")
 AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=People,dc=neuf,dc=no"
 # groups
-#AUTH_LDAP_GROUP_SEARCH = LDAPSearch("ou=Groups,dc=neuf,dc=no",
-#    ldap.SCOPE_ONELEVEL, "(objectClass=posixGroup)"
-#)
-#AUTH_LDAP_GROUP_TYPE = PosixGroupType()
+AUTH_LDAP_GROUP_SEARCH = LDAPSearch("ou=Groups,dc=neuf,dc=no",
+    ldap.SCOPE_ONELEVEL, "(objectClass=posixGroup)"
+)
+AUTH_LDAP_GROUP_TYPE = PosixGroupType()
 
-#AUTH_LDAP_USER_ATTR_MAP = {"first_name": "givenName", "last_name": "sn"}
+AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+    "is_active": "cn=dns-alle,ou=Groups,dc=neuf,dc=no",
+    "is_staff": "cn=edb,ou=Groups,dc=neuf,dc=no",
+    "is_superuser": "cn=edbadmin,ou=Groups,dc=neuf,dc=no"
+}
+AUTH_LDAP_PROFILE_FLAGS_BY_GROUP = {
+    "is_edb": "cn=edb,ou=Groups,dc=neuf,dc=no"
+    # TODO: function that generates this map of flags for alle groups.
+}
+AUTH_LDAP_USER_ATTR_MAP = {
+    "first_name": "givenName",
+    "last_name": "sn",
+    "email": "mail",
+}
 #user and group mappings
-#AUTH_LDAP_USER_FLAGS_BY_GROUP = {
-#    "is_active": "cn=dns-alle,ou=Groups,dc=neuf,dc=no",
-#    "is_staff": "cn=edb,ou=Groups,dc=neuf,dc=no",
-#    "is_superuser": "cn=edbadmin,ou=Groups,dc=example,dc=com"
-#}
-#AUTH_LDAP_PROFILE_FLAGS_BY_GROUP = {
-#    "is_edb": "cn=edb,ou=Groups,dc=neuf,dc=no"
-#}
-#AUTH_LDAP_PROFILE_ATTR_MAP = {"home_directory": "homeDirectory"}
+AUTH_LDAP_PROFILE_ATTR_MAP = {
+    "home_directory": "homeDirectory"
+}
 
 import logging
 
