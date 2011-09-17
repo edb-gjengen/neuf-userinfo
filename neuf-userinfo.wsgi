@@ -8,7 +8,7 @@ def map_path(target_name=''):
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'neuf-userinfo.settings'
 
-path = map_path(".")
+path = map_path("..")
 if path not in sys.path:
     sys.path.append(path)
 import django.core.handlers.wsgi

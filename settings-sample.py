@@ -102,7 +102,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 #ldap server url
-AUTH_LDAP_SERVER_URI = "ldap://ldap-test.neuf.no"
+AUTH_LDAP_SERVER_URI = "ldap://dev.neuf.no"
 
 import ldap
 from django_auth_ldap.config import LDAPSearch, PosixGroupType
