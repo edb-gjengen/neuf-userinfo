@@ -1,4 +1,3 @@
-# Django settings for dns_userinfo project.
 from os.path import dirname, join
 
 def map_path(target_name):
@@ -81,7 +80,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'dns_userinfo.urls'
+ROOT_URLCONF = 'neuf-userinfo.urls'
 
 TEMPLATE_DIRS = (
     map_path('templates/'), 

@@ -1,0 +1,14 @@
+INSTALL
+=======
+Newer Ubuntus/Debians (11.04+/6.0+):
+ - apt-get install python-django python-ldap python-sqlite python-django-auth-ldap
+Other:
+ - Get latest python-django from http://djangoproject.com
+ - Get latest django-auth-ldap from http://pypi.python.org/pypi/django-auth-ldap/1.0.11
+ - Unpack and run: 'python setup.py install' in both dirs.
+
+Apache:
+ - Make a Vhost
+ - add  WSGIScriptAlias / /path/to/project/neuf-userinfo/neuf-userinfo.wsgi
+
+More...
