@@ -22,8 +22,15 @@ DATABASES = {
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    },
+    'ldap': {
+        'ENGINE': 'ldapdb.backends.ldap',
+        'NAME': 'ldap://localhost/',
+        'USER': 'cn=admin,dc=neuf,dc=no',
+        'PASSWORD': '',
     }
 }
+DATABASE_ROUTERS = ['ldapdb.router.Router']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -32,7 +39,7 @@ DATABASES = {
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'Europe/Oslo'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -92,10 +99,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'django.contrib.admin',
-    'django.contrib.admindocs',
     'main',
-    #'ldapdb',
+    'ldapdb',
+    'django.contrib.admin',
 )
 AUTHENTICATION_BACKENDS = (
     'django_auth_ldap.backend.LDAPBackend',
