@@ -107,44 +107,49 @@ AUTHENTICATION_BACKENDS = (
     'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
-#ldap server url
-AUTH_LDAP_SERVER_URI = "ldap://localhost"
+# LDAP server URI
+AUTH_LDAP_SERVER_URI = DATABASES['ldap']['NAME']
 
 import ldap
 from django_auth_ldap.config import LDAPSearch, PosixGroupType
-# basic user auth
-AUTH_LDAP_BIND_DN = "uid=admin,ou=People,dc=neuf,dc=no"
-AUTH_LDAP_BIND_PASSWORD = ""
+# Basic user auth
+AUTH_LDAP_BIND_DN = DATABASES['ldap']['USER']
+AUTH_LDAP_BIND_PASSWORD = DATABASES['ldap']['PASSWORD']
 AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=People,dc=neuf,dc=no",
     ldap.SCOPE_ONELEVEL, "(uid=%(user)s)")
 AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=People,dc=neuf,dc=no"
-# groups
+# Basic groups
 AUTH_LDAP_GROUP_SEARCH = LDAPSearch("ou=Groups,dc=neuf,dc=no",
     ldap.SCOPE_ONELEVEL, "(objectClass=posixGroup)"
 )
 AUTH_LDAP_GROUP_TYPE = PosixGroupType()
-
+# Mirror groups on each auth
+AUTH_LDAP_MIRROR_GROUPS = True
+# Group to user flag mappings
 AUTH_LDAP_USER_FLAGS_BY_GROUP = {
     "is_active": "cn=dns-alle,ou=Groups,dc=neuf,dc=no",
     "is_staff": "cn=edb,ou=Groups,dc=neuf,dc=no",
     "is_superuser": "cn=edbadmin,ou=Groups,dc=neuf,dc=no"
 }
+# Group to profile flag mappings, not used.
 AUTH_LDAP_PROFILE_FLAGS_BY_GROUP = {
-    "is_edb": "cn=edb,ou=Groups,dc=neuf,dc=no"
-    # TODO: function that generates this map of flags for alle groups.
+    #"is_edb": "cn=edb,ou=Groups,dc=neuf,dc=no"
 }
+# User attribute mappings
 AUTH_LDAP_USER_ATTR_MAP = {
     "first_name": "givenName",
     "last_name": "sn",
     "email": "mail",
 }
-#user and group mappings
+# User profile attribute mappings
 AUTH_LDAP_PROFILE_ATTR_MAP = {
     "home_directory": "homeDirectory"
 }
+# Allways update the django user object on authentication.
+AUTH_LDAP_ALWAYS_UPDATE_USER = True
 
+# Debug logging
 import logging
-
 logger = logging.getLogger('django_auth_ldap')
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.DEBUG)
