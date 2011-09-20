@@ -26,7 +26,7 @@ DATABASES = {
     'ldap': {
         'ENGINE': 'ldapdb.backends.ldap',
         'NAME': 'ldap://localhost/',
-        'USER': 'cn=admin,dc=neuf,dc=no',
+        'USER': 'uid=admin,ou=People,dc=neuf,dc=no',
         'PASSWORD': '',
     }
 }
@@ -87,7 +87,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'neuf-userinfo.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     map_path('templates/'), 
@@ -108,12 +108,12 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 #ldap server url
-AUTH_LDAP_SERVER_URI = "ldap://dev.neuf.no"
+AUTH_LDAP_SERVER_URI = "ldap://localhost"
 
 import ldap
 from django_auth_ldap.config import LDAPSearch, PosixGroupType
 # basic user auth
-AUTH_LDAP_BIND_DN = "admin"
+AUTH_LDAP_BIND_DN = "uid=admin,ou=People,dc=neuf,dc=no"
 AUTH_LDAP_BIND_PASSWORD = ""
 AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=People,dc=neuf,dc=no",
     ldap.SCOPE_ONELEVEL, "(uid=%(user)s)")
