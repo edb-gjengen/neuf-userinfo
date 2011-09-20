@@ -7,7 +7,7 @@ class LdapUser(ldapdb.models.Model):
     """
     # LDAP meta-data
     base_dn = "ou=People,dc=neuf,dc=no"
-    object_classes = ['posixAccount', 'shadowAccount', 'inetOrgPerson']
+    object_classes = ['inetOrgPerson', 'posixAccount', 'shadowAccount']
 
     # inetOrgPerson
     first_name = CharField(db_column='givenName')
