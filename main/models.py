@@ -38,7 +38,7 @@ class LdapGroup(ldapdb.models.Model):
     Class for representing an LDAP group entry.
     """
     # LDAP meta-data
-    base_dn = "cn=Groups,dc=neuf,dc=no"
+    base_dn = "ou=Groups,dc=neuf,dc=no"
     object_classes = ['posixGroup']
 
     # posixGroup attributes
