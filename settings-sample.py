@@ -107,14 +107,15 @@ AUTHENTICATION_BACKENDS = (
     'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
-# LDAP server URI
+# LDAP server URI and BIND_DN, same as db-settings
 AUTH_LDAP_SERVER_URI = DATABASES['ldap']['NAME']
+AUTH_LDAP_BIND_DN = DATABASES['ldap']['USER']
+AUTH_LDAP_BIND_PASSWORD = DATABASES['ldap']['PASSWORD']
 
 import ldap
 from django_auth_ldap.config import LDAPSearch, PosixGroupType
+
 # Basic user auth
-AUTH_LDAP_BIND_DN = DATABASES['ldap']['USER']
-AUTH_LDAP_BIND_PASSWORD = DATABASES['ldap']['PASSWORD']
 AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=People,dc=neuf,dc=no",
     ldap.SCOPE_ONELEVEL, "(uid=%(user)s)")
 AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=People,dc=neuf,dc=no"

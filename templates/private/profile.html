@@ -1,0 +1,12 @@
+<ul>
+    <li>Brukernavn: {{ldap_user.username}}</li>
+    <li>Navn: {{ldap_user.full_name}}</li>
+    <li>Mail: {{ldap_user.email}}</li>
+</ul>
+<ul>
+    <li><a href="{% url django.contrib.auth.views.password_change %}">Endre passord</a></li>
+    {% if request.user.is_superuser %}
+    <li><a href="/admin">Administrasjon</a></li>
+    {% endif %}
+    <li><a href="{% url django.contrib.auth.views.logout %}">Logg ut</a></li>
+</ul>

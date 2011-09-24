@@ -6,7 +6,7 @@ class LdapUser(ldapdb.models.Model):
     Class for representing an LDAP user entry.
     """
     # LDAP meta-data
-    base_dn = "ou=People,dc=neuf,dc=no"
+    base_dn = "ou=People,dc=neuf,dc=no" # CONFIG
     object_classes = ['inetOrgPerson', 'posixAccount', 'shadowAccount']
 
     # inetOrgPerson
@@ -27,6 +27,11 @@ class LdapUser(ldapdb.models.Model):
     username = CharField(db_column='uid', primary_key=True)
     password = CharField(db_column='userPassword')
 
+    def set_new_password(self, new_pw):
+        import passwd
+        self.password = passwd.ldap_create(new_pw)
+        self.save()
+
     def __str__(self):
         return self.username
 
@@ -38,7 +43,7 @@ class LdapGroup(ldapdb.models.Model):
     Class for representing an LDAP group entry.
     """
     # LDAP meta-data
-    base_dn = "ou=Groups,dc=neuf,dc=no"
+    base_dn = "ou=Groups,dc=neuf,dc=no" # CONFIG
     object_classes = ['posixGroup']
 
     # posixGroup attributes
