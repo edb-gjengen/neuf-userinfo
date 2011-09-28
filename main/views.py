@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from models import *
 
 # My views
-@login_required
 def index(request):
     return render_to_response('public/index.html', locals(), context_instance=RequestContext(request))
 
