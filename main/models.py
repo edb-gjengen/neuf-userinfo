@@ -1,6 +1,8 @@
 from ldapdb.models.fields import CharField, ImageField, IntegerField, ListField
 import ldapdb.models
-
+import passwd
+from django.core.validators import MinLengthValidator
+from validators import PasswordValidator
 class LdapUser(ldapdb.models.Model):
     """
     Class for representing an LDAP user entry.
@@ -27,10 +29,21 @@ class LdapUser(ldapdb.models.Model):
     username = CharField(db_column='uid', primary_key=True)
     password = CharField(db_column='userPassword')
 
-    def set_new_password(self, new_pw):
-        import passwd
-        self.password = passwd.ldap_create(new_pw)
-        self.save()
+    def set_password(self, raw_password):
+        if raw_password is None:
+            self.password = "!"
+        else:
+            # Validation here?
+            MinLengthValidator(8)(raw_password)
+            PasswordValidator(raw_password)
+            self.password = passwd.ldap_create(raw_password)
+            self.save()
+
+    def check_password(self, raw_password):
+        """
+        Returns a boolean of whether the raw_password was correct.
+        """
+        return passwd.ldap_validate(raw_password, self.password)
 
     def __str__(self):
         return self.username
