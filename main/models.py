@@ -1,8 +1,6 @@
 from ldapdb.models.fields import CharField, ImageField, IntegerField, ListField
 import ldapdb.models
 import passwd
-from django.core.validators import MinLengthValidator
-from validators import PasswordValidator
 class LdapUser(ldapdb.models.Model):
     """
     Class for representing an LDAP user entry.
@@ -33,9 +31,6 @@ class LdapUser(ldapdb.models.Model):
         if raw_password is None:
             self.password = "!"
         else:
-            # Validation here?
-            MinLengthValidator(8)(raw_password)
-            PasswordValidator(raw_password)
             self.password = passwd.ldap_create(raw_password)
             self.save()
 

@@ -1,4 +1,6 @@
 from django.contrib.auth.forms import SetPasswordForm
+from django.core.validators import MinLengthValidator
+from validators import PasswordValidator
 
 from models import *
 
@@ -12,6 +14,13 @@ class LDAPSetPasswordForm(SetPasswordForm):
         if commit:
             self.user.save()
         return self.user
+
+    def clean_new_password1(self):
+        raw_password = self.cleaned_data.get('new_password1')
+        # Validation here?
+        MinLengthValidator(8)(raw_password)
+        PasswordValidator(raw_passwords)
+        return raw_password
 
 class LDAPPasswordChangeForm(LDAPSetPasswordForm):
     pass
