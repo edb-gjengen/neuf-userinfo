@@ -1,6 +1,7 @@
 from ldapdb.models.fields import CharField, ImageField, IntegerField, ListField
 import ldapdb.models
 import passwd
+import datetime
 class LdapUser(ldapdb.models.Model):
     """
     Class for representing an LDAP user entry.
@@ -26,6 +27,9 @@ class LdapUser(ldapdb.models.Model):
     login_shell = CharField(db_column='loginShell', default='/bin/bash')
     username = CharField(db_column='uid', primary_key=True)
     password = CharField(db_column='userPassword')
+
+    # trick to use django internals for password reset
+    last_login = datetime.datetime.now()
 
     def set_password(self, raw_password):
         if raw_password is None:
