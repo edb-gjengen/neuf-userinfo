@@ -63,7 +63,7 @@ def password_reset_confirm(request, uidb36=None, token=None,
         post_reset_redirect = reverse('django.contrib.auth.views.password_reset_complete')
     try:
         uid_int = base36_to_int(uidb36)
-        user = LdapUser.objects.get(uid=uid_int) # Diff line vs internal django view 
+        user = LdapUser.objects.get(id=uid_int) # Diff line vs internal django view 
     except (ValueError, User.DoesNotExist):
         user = None
 
