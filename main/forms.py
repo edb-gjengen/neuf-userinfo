@@ -27,8 +27,8 @@ class LDAPPasswordChangeForm(LDAPSetPasswordForm):
 
 class LDAPPasswordResetForm(PasswordResetForm):
     def clean_email(self):
-        email = self.cleaned_data["email"]
-        self.users_cache = LdapUser.objects.filter(email__iexact=email)
+        email = self.cleaned_data["email"].lower()
+        self.users_cache = LdapUser.objects.filter(email=email)
         if len(self.users_cache) == 0:
             raise forms.ValidationError(_("That e-mail address doesn't have an associated user account. Are you sure you've registered?"))
         return email
