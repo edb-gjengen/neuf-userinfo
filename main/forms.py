@@ -19,7 +19,7 @@ class LDAPSetPasswordForm(SetPasswordForm):
         raw_password = self.cleaned_data.get('new_password1')
         # Validation here?
         MinLengthValidator(8)(raw_password)
-        PasswordValidator(raw_passwords)
+        PasswordValidator(raw_password)
         return raw_password
 
 class LDAPPasswordChangeForm(LDAPSetPasswordForm):
