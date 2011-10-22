@@ -29,7 +29,7 @@ class LdapUser(ldapdb.models.Model):
     password = CharField(db_column='userPassword')
 
     # ugly hack to use django internals for password reset
-    last_login = datetime.datetime.(2001, 1, 1)
+    last_login = datetime.datetime(2001, 1, 1)
 
     def set_password(self, raw_password):
         if raw_password is None:
