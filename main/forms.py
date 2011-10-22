@@ -1,4 +1,4 @@
-from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.forms import SetPasswordForm, PasswordResetForm
 from django.core.validators import MinLengthValidator
 from validators import PasswordValidator
 
@@ -24,16 +24,12 @@ class LDAPSetPasswordForm(SetPasswordForm):
 
 class LDAPPasswordChangeForm(LDAPSetPasswordForm):
     pass
-    #old_password = forms.CharField(label=_("Old password"), widget=forms.PasswordInput)
 
-    #def clean_old_password(self):
-    #    """
-    #    Validates that the old_password field is correct.
-    #    """
-    #    old_password = self.cleaned_data["old_password"]
-    #    if not self.user.check_password(old_password):
-    #        raise forms.ValidationError(_("Your old password was entered incorrectly. Please enter it again."))
-    #    return old_password
-    #
-    #PasswordChangeForm.base_fields.keyOrder = ['old_password', 'new_password1', 'new_password2']
+class LDAPPasswordResetForm(PasswordResetForm):
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        self.users_cache = LdapUser.objects.filter(email__iexact=email)
+        if len(self.users_cache) == 0:
+            raise forms.ValidationError(_("That e-mail address doesn't have an associated user account. Are you sure you've registered?"))
+        return email
 

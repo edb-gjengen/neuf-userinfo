@@ -19,7 +19,7 @@ class LdapUser(ldapdb.models.Model):
     photo = ImageField(db_column='jpegPhoto')
 
     # posixAccount
-    uid = IntegerField(db_column='uidNumber', unique=True)
+    id = IntegerField(db_column='uidNumber', unique=True) # referenced in reset password form
     group = IntegerField(db_column='gidNumber')
     gecos =  CharField(db_column='gecos')
     home_directory = CharField(db_column='homeDirectory')
