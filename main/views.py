@@ -1,31 +1,47 @@
 from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth import login, logout as auth_logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import SetPasswordForm, AuthenticationForm
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import SetPasswordForm
 from django.utils.http import base36_to_int
-from django.core.urlresolvers import reverse
 from django.views.decorators.cache import never_cache
-from django.contrib.auth.tokens import default_token_generator
-
+from django.views.decorators.csrf import csrf_protect
 
 from forms import LDAPPasswordResetForm
 from models import *
 
-# My views
 def index(request):
+    if request.method == "POST":
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            # Log the user in.
+            login(request, form.get_user())
+    else:
+        if request.user.is_authenticated():
+            return HttpResponseRedirect( reverse('main.views.profile') )
+        else:
+            form = AuthenticationForm(request)
+
     return render_to_response('public/index.html', locals(), context_instance=RequestContext(request))
 
 @login_required
-def profile(request, username=None):
-    ldap_user = ""
+def profile(request):
+    ldap_user = None
     try:
         ldap_user = LdapUser.objects.get(username=request.user)
     except:
         pass
 
     return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
+
+
+def logout(request):
+    auth_logout(request)
+    return render_to_response('registration/logout.html', locals(), context_instance=RequestContext(request))
 
 # Doesn't need csrf_protect since no-one can guess the URL
 @never_cache

@@ -8,5 +8,5 @@
     {% if request.user.is_superuser %}
     <li><a href="/admin">Administrasjon</a></li>
     {% endif %}
-    <li><a href="{% url django.contrib.auth.views.logout %}">Logg ut</a></li>
+    <li><a href="{% url main.views.logout %}">Logg ut</a></li>
 </ul>
