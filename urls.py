@@ -18,7 +18,7 @@ urlpatterns = patterns('',
         {'password_reset_form' : LDAPPasswordResetForm}),
     (r'^accounts/password/reset/done$', 'django.contrib.auth.views.password_reset_done'),
     # Set password
-    (r'^accounts/password/reset/confirm$', 'main.views.password_reset_confirm',
+    (r'^accounts/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)$', 'main.views.password_reset_confirm',
         {'set_password_form': LDAPSetPasswordForm}),
     (r'^accounts/password/reset/complete$', 'django.contrib.auth.views.password_reset_complete'),
     (r'^$', 'main.views.index'),
