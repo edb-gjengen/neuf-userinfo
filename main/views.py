@@ -14,7 +14,6 @@ from django.views.decorators.csrf import csrf_protect
 
 from forms import LDAPPasswordResetForm
 from models import *
-import service
 from datetime import datetime
 import simplejson as json
 
