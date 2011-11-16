@@ -1,3 +1,4 @@
+# coding: utf-8
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
@@ -13,6 +14,9 @@ from django.views.decorators.csrf import csrf_protect
 
 from forms import LDAPPasswordResetForm
 from models import *
+import service
+from datetime import datetime
+import simplejson as json
 
 def index(request):
     if request.method == "POST":
@@ -35,9 +39,24 @@ def profile(request):
         ldap_user = LdapUser.objects.get(username=request.user)
     except:
         pass
+    groups = LdapGroup.objects.filter(usernames__contains=request.user)
+    private_group = LdapGroup.objects.filter(gid=ldap_user.group)[0]
 
     return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
 
+def radius_info():
+    return {'active': True}
+
+def kerberos_info():
+    return {'active': True}
+
+def client_status(request):
+    status = kerberos_info()
+    return HttpResponse(json.dumps(status), content_type='application/javascript; charset=utf8')
+
+def wireless_status(request):
+    status = radius_info()
+    return HttpResponse(json.dumps(status), content_type='application/javascript; charset=utf8')
 
 def logout(request):
     auth_logout(request)
