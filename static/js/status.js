@@ -9,12 +9,12 @@
 $(function() {
     var img_check = ' <img src="/static/check.png" alt="OK" />';
 
-    $.getJSON("http://localhost:8000/userstatus/client/?format=json", function(data) {
+    $.getJSON("/userstatus/client/?format=json", function(data) {
         if(data.active) {
             $("#client_status").html(img_check);
         }
     });
-    $.getJSON('http://localhost:8000/userstatus/wireless/?format=json', function(data) {
+    $.getJSON('/userstatus/wireless/?format=json', function(data) {
         if(data.active) {
             $("#wireless_status").html(img_check);
         }
