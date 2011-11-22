@@ -49,7 +49,7 @@ def profile(request):
 
 def client_status(request):
     krb5_principal = utils.get_kerberos_principal(request.user)
-    if kr5b_principal:
+    if krb5_principal:
         status = { 'active' : True, 'last_modified' : krb5_principal['Last modified'] }
     else:
         status = { 'active' : False }
