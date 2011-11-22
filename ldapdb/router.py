@@ -43,6 +43,7 @@ class Router(object):
 
     NOTE: if you have more than one LDAP database, you will need to
     write your own router.
+    Yes.
     """
 
     def __init__(self):

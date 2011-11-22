@@ -3,16 +3,24 @@ from django.core.validators import MinLengthValidator
 from validators import PasswordValidator
 
 from models import *
+import utils 
 
 # not needed?
 class LDAPSetPasswordForm(SetPasswordForm):
     def save(self, commit=True):
+        # set kerberos password
+        set_krb5 = utils.set_kerberos_password(self.user.username, self.cleaned_data['new_password1'])
+        
+        # set radius password
+        set_radius = utils.set_radius_password(self.user.username, self.cleaned_data['new_password1'])
+
         # Lookup the Ldap user with the identical username (1-to-1).
         self.user = LdapUser.objects.get(username=self.user.username)
 
         self.user.set_password(self.cleaned_data['new_password1'])
         if commit:
             self.user.save()
+
         return self.user
 
     def clean_new_password1(self):

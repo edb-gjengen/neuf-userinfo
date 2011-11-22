@@ -37,11 +37,13 @@ def profile(request):
     try:
         ldap_user = LdapUser.objects.get(username=request.user)
     except:
-        pass
+        return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
+
     groups = LdapGroup.objects.filter(usernames__contains=request.user)
     private_group = LdapGroup.objects.filter(gid=ldap_user.group)[0]
 
     return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
+
 
 def radius_info():
     return {'active': True}

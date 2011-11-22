@@ -21,10 +21,14 @@
 </ul>
 <h1>Dine grupper</h1>
 <ul>
+{% if groups %}
     <li>{{ private_group }}</li>
     {% for group in groups %}
         <li>{{ group }}</li>
     {% endfor %}
+{% else %}
+<li>Ingen grupper.</li>
+{% endif %}
 </ul>
 <h1>Dine tjenester</h1>
 <ul>

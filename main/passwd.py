@@ -23,3 +23,8 @@ def ldap_validate(raw_password, challenge_password):
     hr = hashlib.sha1(raw_password)
     hr.update(salt)
     return digest == hr.digest()
+
+def radius_create(raw_password):
+    # found in the wild.
+    nt_password = hashlib.new('md4', raw_password.encode('utf-16le')).hexdigest()
+    return nt_password
