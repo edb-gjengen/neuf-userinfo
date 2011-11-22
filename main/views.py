@@ -1,4 +1,7 @@
 # coding: utf-8
+from datetime import datetime
+import simplejson as json
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
@@ -15,8 +18,7 @@ from django.views.decorators.csrf import csrf_protect
 
 from forms import LDAPPasswordResetForm
 from models import *
-from datetime import datetime
-import simplejson as json
+import utils
 
 def index(request):
     if request.method == "POST":
@@ -46,7 +48,7 @@ def profile(request):
     return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
 
 def client_status(request):
-    krb5_principal = get_kerberos_principal(request.user)
+    krb5_principal = utils.get_kerberos_principal(request.user)
     if kr5b_principal:
         status = { 'active' : True, 'last_modified' : krb5_principal['Last modified'] }
     else:
