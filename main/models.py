@@ -180,4 +180,3 @@ class Radusergroup(models.Model):
     class Meta:
         db_table = u'radusergroup'
 
-

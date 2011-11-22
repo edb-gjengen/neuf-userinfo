@@ -21,6 +21,8 @@ class LDAPSetPasswordForm(SetPasswordForm):
         if commit:
             self.user.save()
 
+        # TODO: Log the result of the above.
+        
         return self.user
 
     def clean_new_password1(self):

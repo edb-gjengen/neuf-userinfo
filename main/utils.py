@@ -4,9 +4,10 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from models import Radcheck
 import passwd
+import settings
 
 def set_kerberos_password(username, raw_password):
-    principal = u"{0}@NEUF.NO".format(username)
+    principal = u"{0}@{1}".format(username, settings.KERBEROS_REALM)
     kadmin_query = u"-q change_password {0} -pw {1}".format(principal, raw_password)
     p = Popen(['kadmin', kadmin_query], stdout=PIPE)
     output, error = p.communicate()
