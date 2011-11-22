@@ -59,6 +59,9 @@ class LdapGroup(ldapdb.models.Model):
     """
     Class for representing an LDAP group entry.
     """
+
+    connection_name = 'ldap'
+
     # LDAP meta-data
     base_dn = "ou=Groups,dc=neuf,dc=no" # CONFIG
     object_classes = ['posixGroup']

@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import SetPasswordForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -44,19 +45,20 @@ def profile(request):
 
     return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
 
-
-def radius_info():
-    return {'active': True}
-
-def kerberos_info():
-    return {'active': True}
-
 def client_status(request):
-    status = kerberos_info()
+    krb5_principal = get_kerberos_principal(request.user)
+    if kr5b_principal:
+        status = { 'active' : True, 'last_modified' : krb5_principal['Last modified'] }
+    else:
+        status = { 'active' : False }
     return HttpResponse(json.dumps(status), content_type='application/javascript; charset=utf8')
 
 def wireless_status(request):
-    status = radius_info()
+    try:
+        radius_user = Radcheck.objects.get(username=request.user)
+        status = { 'active' : True, 'hash': radius_user.attribute }
+    except ObjectDoesNotExist:
+        status = { 'active' : False }
     return HttpResponse(json.dumps(status), content_type='application/javascript; charset=utf8')
 
 def logout(request):
