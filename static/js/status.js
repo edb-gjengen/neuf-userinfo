@@ -13,7 +13,7 @@ $(function() {
 
     $.getJSON("/userstatus/client/?format=json", function(data) {
         if(data.active) {
-            image = image + img_check + ' title="Account present. Last successfull authentication: ' + data.last_successful_auth + '" />';
+            image = img_check + ' title="Account present.\nLast successfull authentication: ' + data.last_successful_auth + '" />';
         } else {
             image = img_error + ' title="No client account (kerberos principal)." />';
         }
