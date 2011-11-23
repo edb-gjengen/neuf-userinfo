@@ -66,7 +66,7 @@ def wireless_status(request):
         radius_user = Radcheck.objects.get(username=request.user)
         # get last authentication
         last_auth = Radpostauth.objects.filter(username__iexact=request.user,reply='Access-Accept').order_by('authdate')
-        if len(last_auth) == 1:
+        if len(last_auth) != 0:
             status = { 'active' : True,
                        'last_successful_auth': last_auth[0].authdate.strftime('%Y-%m-%d %H:%M:%S'),
                        'hash': radius_user.attribute }
