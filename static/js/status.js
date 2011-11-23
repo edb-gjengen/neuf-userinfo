@@ -20,7 +20,6 @@ $(function() {
         $("#client_status").html(image);
     });
     $.getJSON('/userstatus/wireless/?format=json', function(data) {
-        console.log(data);
         if(data.active) {
             image = img_check + ' title="Account present.\nLast successful authentication: ' + data.last_successful_auth + '" />';
         } else {
