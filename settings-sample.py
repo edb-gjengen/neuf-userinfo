@@ -165,3 +165,6 @@ logger.setLevel(logging.DEBUG)
 
 # Kerberos realm
 KERBEROS_REALM = "NEUF.NO"
+KERBEROS_PASSWORD_CHANGING_PRINCIPAL = 'brukerinfo'
+KERBEROS_PASSWORD = ''
+
