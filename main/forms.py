@@ -5,7 +5,6 @@ from validators import PasswordValidator
 from models import *
 import utils 
 
-# not needed?
 class LDAPSetPasswordForm(SetPasswordForm):
     def save(self, commit=True):
         # set kerberos password

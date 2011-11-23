@@ -47,18 +47,31 @@ def profile(request):
 
     return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
 
+#todo security
 def client_status(request):
     krb5_principal = utils.get_kerberos_principal(request.user)
     if krb5_principal:
-        status = { 'active' : True, 'last_modified' : krb5_principal['Last modified'] }
+        last_succ_auth = datetime.strptime(krb5_principal['Last successful authentication'],
+                                           '%a %b %m %H:%M:%S %Z %Y')
+        status = { 'active' : True,
+                   'last_successful_auth' : last_succ_auth.strftime('%Y-%m-%d %H:%M:%S'),
+                   'last_modified' : krb5_principal['Last modified'] }
     else:
         status = { 'active' : False }
     return HttpResponse(json.dumps(status), content_type='application/javascript; charset=utf8')
 
+#todo security
 def wireless_status(request):
     try:
         radius_user = Radcheck.objects.get(username=request.user)
-        status = { 'active' : True, 'hash': radius_user.attribute }
+        # get last authentication
+        last_auth = Radpostauth.objects.filter(username__iexact=request.user,reply='Access-Accept').order_by('authdate')
+        if len(last_auth) == 1:
+            status = { 'active' : True,
+                       'last_successful_auth': last_auth[0].authdate.strftime('%Y-%m-%d %H:%M:%S'),
+                       'hash': radius_user.attribute }
+        else:
+            status = { 'active' : True, 'hash': radius_user.attribute }
     except ObjectDoesNotExist:
         status = { 'active' : False }
     return HttpResponse(json.dumps(status), content_type='application/javascript; charset=utf8')
