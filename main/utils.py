@@ -43,10 +43,19 @@ def set_kerberos_password(username, raw_password):
         return True
 
 def set_radius_password(username, raw_password):
+    """
+        Set password in Radius mysql backend. 
+        Create user if one with an NT-Password does not exist.
+    """
     try:
         radius_user = Radcheck.objects.get(username=username)
     except ObjectDoesNotExist:
-        return False
+        radius_user = Radcheck(username=username, attribute='NT-Password', op=':=')
+    
+    # Some have clear text passwords!
+    if radius_user.attribute != 'NT-Password':
+        radius_user.attribute = 'NT-Password'
+
     radius_user.value = passwd.radius_create(raw_password)
     radius_user.save()
     return True
