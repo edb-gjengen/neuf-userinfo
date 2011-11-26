@@ -29,10 +29,10 @@ def get_kerberos_principal(username):
 
 def set_kerberos_password(username, raw_password):
     principal = u"{0}@{1}".format(username, settings.KERBEROS_REALM)
-    kadmin_query = u" -p {0} -w {1} -q 'change_password {2} -pw {3}'".format(settings.KERBEROS_PASSWORD_CHANGING_PRINCIPAL,
+    kadmin_query = u" -p {0} -w {1} -q 'change_password -pw {2} {3}'".format(settings.KERBEROS_PASSWORD_CHANGING_PRINCIPAL,
             settings.KERBEROS_PASSWORD,
-            principal,
-            raw_password)
+            raw_password,
+            principal)
     p = Popen('kadmin' + kadmin_query, shell=True, stdout=PIPE, stderr=PIPE)
     output, error = p.communicate()
     if error:
