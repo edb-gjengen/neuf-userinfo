@@ -1,0 +1,43 @@
+// This import applies a global reset to any page that imports this stylesheet.
+@import "blueprint/reset";
+
+// To configure blueprint, edit the partials/base.sass file.
+@import "partials/base";
+
+// Import all the default blueprint modules so that we can access their mixins.
+@import "blueprint";
+
+// Combine the partials into a single screen stylesheet.
+@import "partials/page";
+@import "partials/form";
+@import "partials/_col";
+@import "compass/css3";
+
+body {
+    background-color: $blueprint-background-color;
+    #header {
+        padding-bottom:40px;
+    }
+    #container {
+        padding:10px;
+        background-color:$container-background-color;
+        @include box-shadow($container-shadow-color 2px 2px 6px);
+        @include border-radius(10px);
+
+        nav {
+            ul {
+                @include inline-block-list;
+            }
+        }
+
+        section {
+            background-color:$section-background-color;
+            border: solid 1px $section-border-color;
+            @include border-radius(6px);
+            min-height:170px;
+            &:hover {
+                background-color:$section-hover-color;
+            }
+        }
+    }
+}

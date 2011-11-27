@@ -1,12 +1,21 @@
+<!doctype html>
 <html>
 <head>
     <title>{%block title%}Userinfo{%endblock%}</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/static/style/stylesheets/screen.css" type="text/css" media="screen, projection">
+    <link rel="stylesheet" href="/static/style/stylesheets/print.css" type="text/css" media="print"> 
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="/static/style/stylesheets/ie.css" type="text/css" media="screen, projection">
+    <![endif]-->
     {%block headinc %}
     {%endblock%}
 </head>
-<body>
-    {%block content%}
-    {%endblock%}
+<body class="bp three-col">
+    <div id="container">
+        {%block content%}
+        {%endblock%}
+    </div>
 
     {%block tailinc %}
     {%endblock%}

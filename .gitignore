@@ -2,4 +2,4 @@
 *.pyc
 settings.py
 test.db
-
+static/style/.sass-cache/
