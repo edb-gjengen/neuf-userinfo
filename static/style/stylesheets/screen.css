@@ -559,3 +559,14 @@ body #footer {
   bottom: 0px;
   left: 20px;
 }
+body ul.errorlist {
+  list-style-type: none;
+  color: #8a1f11;
+  background-color: #fbe3e4;
+  border: solid 2px #fbc2c4;
+}
+body ul.errorlist, body ul.errorlist li {
+  margin: 0px;
+  padding: 0px;
+  display: inline;
+}

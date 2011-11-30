@@ -82,4 +82,11 @@ body {
         bottom: 0px;
         left:20px;
     }
+    ul.errorlist {
+        // copy some style from bp-forms .error
+        @include inline-list;
+        color: $error-color;
+        background-color: $error-bg-color;
+        border: solid 2px $error-border-color;
+    }
 }
