@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
-{% block content %}
-You have been logged out, do you want do <a href="{% url main.views.index %}">login</a> again?
+{% block title %}Logget ut{% endblock %}
 
+{%block header%}
+    {% include "nav.html" with active="logout" %}
+{%endblock%}
+
+{% block content %}
+    Du har blitt logget ut, vil du <a href="{% url main.views.index %}">logge inn</a> igjen?
 {% endblock %}

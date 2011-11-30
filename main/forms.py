@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib.auth.forms import SetPasswordForm, PasswordResetForm
 from django.core.validators import MinLengthValidator
 from validators import PasswordValidator

@@ -12,9 +12,19 @@
     {%endblock%}
 </head>
 <body class="bp three-col">
+    <header id="header">
+    {%block header%}
+    {% include "nav.html" %}
+    {%endblock%}
+    </header>
     <div id="container">
         {%block content%}
         {%endblock%}
+    </div>
+    <div id="footer">
+    {%block footer %}
+        <img src="/static/DNSlogo.png" />
+    {%endblock%}
     </div>
 
     {%block tailinc %}

@@ -13,17 +13,17 @@ $(function() {
 
     $.getJSON("/userstatus/client/?format=json", function(data) {
         if(data.active) {
-            image = img_check + ' title="Account present.\nLast successful authentication: ' + data.last_successful_auth + '" />';
+            image = img_check + ' title="Du har en bruker til foreningsmaskinene. \nSiste vellykkede pålogging: ' + data.last_successful_auth + '" />';
         } else {
-            image = img_error + ' title="No client account (kerberos principal)." />';
+            image = img_error + ' title="Ingen konto (mangler Kerberos principal)." />';
         }
         $("#client_status").html(image);
     });
     $.getJSON('/userstatus/wireless/?format=json', function(data) {
         if(data.active) {
-            image = img_check + ' title="Account present.\nLast successful authentication: ' + data.last_successful_auth + '" />';
+            image = img_check + ' title="Du har tilgang til trådløst nettverk. \nSiste vellykkede pålogging: ' + data.last_successful_auth + '" />';
         } else {
-            image = img_error + ' title="No wireless account." />';
+            image = img_error + ' title="Ingen trådløskonto (i Radius)." />';
         }
         $("#wireless_status").html(image);
     });

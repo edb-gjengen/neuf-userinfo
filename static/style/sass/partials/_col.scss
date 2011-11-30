@@ -41,7 +41,7 @@ body.three-col {
     #container {
         @include container;
     }
-    #header, #footer {
+    #footer {
         @include column($blueprint-grid-columns);
     }
     section.column {
