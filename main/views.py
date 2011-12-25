@@ -1,5 +1,4 @@
 # coding: utf-8
-import datetime
 import simplejson as json
 
 from django.http import HttpResponse, HttpResponseRedirect
@@ -51,10 +50,9 @@ def profile(request):
 def client_status(request):
     krb5_principal = utils.get_kerberos_principal(request.user)
     if krb5_principal:
-        last_succ_auth = datetime.datetime.strptime(krb5_principal['Last successful authentication'],
-                                           '%a %b %d %H:%M:%S %Z %Y')
+        last_succ_auth = utils.format_krb5_date(krb5_principal['Last successful authentication'])
         status = { 'active' : True,
-                   'last_successful_auth' : last_succ_auth.strftime('%Y-%m-%d %H:%M:%S'),
+                   'last_successful_auth' : last_succ_auth,
                    'last_modified' : krb5_principal['Last modified'] }
     else:
         status = { 'active' : False }

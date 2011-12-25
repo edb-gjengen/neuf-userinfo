@@ -1,4 +1,5 @@
 # coding: utf-8
+import datetime
 import re
 
 from subprocess import Popen, PIPE
@@ -59,3 +60,11 @@ def set_radius_password(username, raw_password):
     radius_user.value = passwd.radius_create(raw_password)
     radius_user.save()
     return True
+
+def format_krb5_date(date):
+    try:
+        formatted_date = datetime.datetime.strptime(date, '%a %b %d %H:%M:%S %Z %Y')
+        formatted_date = formatted_date.strftime('%Y-%m-%d %H:%M:%S')
+    except ValueError:
+        formatted_date = 'never'
+    return formatted_date
