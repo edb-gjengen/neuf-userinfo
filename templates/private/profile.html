@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% block headinc %}
     <script type="text/javascript" src="/static/js/jquery-1.6.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.qtip.min.js"></script>
     <script type="text/javascript" src="/static/js/status.js"></script>
+
+    <link rel="stylesheet" href="/static/js/jquery.qtip.min.css" type="text/css" />
 {% endblock %}
 {%block header%}
     {% include "nav.html" with active="profile" %}
@@ -35,8 +38,8 @@
 <section class="column last">
     <h2>Dine tjenester</h2>
     <ul>
-        <li>Trådløst nettverk<span id="wireless_status"></span></li>
-        <li>Foreningsmaskiner<span id="client_status"></span></li>
+        <li><span id="wireless_status">Trådløst nettverk</span></li>
+        <li><span id="client_status">Foreningsmaskiner</span></li>
     </ul>
 </section>
 {%endblock%}

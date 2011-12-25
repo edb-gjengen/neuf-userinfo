@@ -89,4 +89,8 @@ body {
         background-color: $error-bg-color;
         border: solid 2px $error-border-color;
     }
+    .ui-tooltip {
+        font-size: $blueprint-font-size - 2;
+        line-height: 1.2em;
+    }
 }

@@ -570,3 +570,7 @@ body ul.errorlist, body ul.errorlist li {
   padding: 0px;
   display: inline;
 }
+body .ui-tooltip {
+  font-size: 14px;
+  line-height: 1.2em;
+}
