@@ -34,6 +34,7 @@ def set_kerberos_password(username, raw_password):
             settings.KERBEROS_PASSWORD,
             raw_password,
             principal)
+    # Note: Running this shell command could need escaping: http://qntm.org/bash
     p = Popen('kadmin' + kadmin_query, shell=True, stdout=PIPE, stderr=PIPE)
     output, error = p.communicate()
     if error:
