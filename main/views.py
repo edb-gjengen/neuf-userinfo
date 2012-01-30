@@ -3,7 +3,7 @@ import simplejson as json
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, logout as auth_logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import SetPasswordForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
@@ -42,6 +42,19 @@ def profile(request):
         return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
 
     groups = LdapGroup.objects.filter(usernames__contains=request.user)
+    private_group = LdapGroup.objects.filter(gid=ldap_user.group)[0]
+
+    return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
+
+@permission_required('main.is_superuser')
+def user_profile(request, username):
+    ldap_user = None
+    try:
+        ldap_user = LdapUser.objects.get(username=username)
+    except:
+        return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
+
+    groups = LdapGroup.objects.filter(usernames__contains=username)
     private_group = LdapGroup.objects.filter(gid=ldap_user.group)[0]
 
     return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))

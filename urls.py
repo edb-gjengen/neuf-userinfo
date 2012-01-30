@@ -8,6 +8,7 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^accounts/profile/$', 'main.views.profile'),
+    (r'^accounts/profile/(?P<username>\w+)$', 'main.views.user_profile'),
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
     (r'^accounts/logout/$', 'main.views.logout'),
     # Change password
