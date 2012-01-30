@@ -61,7 +61,7 @@ def user_profile(request, username):
 
 #todo security
 def client_status(request):
-    krb5_principal = utils.get_kerberos_principal(request.user)
+    krb5_principal = utils.get_kerberos_principal(request.GET.get('username'))
     if krb5_principal:
         last_succ_auth = utils.format_krb5_date(krb5_principal['Last successful authentication'])
         status = { 'active' : True,
@@ -74,9 +74,9 @@ def client_status(request):
 #todo security
 def wireless_status(request):
     try:
-        radius_user = Radcheck.objects.get(username=request.user)
+        radius_user = Radcheck.objects.get(username=request.GET.get('username'))
         # get last authentication
-        last_auth = Radpostauth.objects.filter(username__iexact=request.user,reply='Access-Accept').order_by('authdate')
+        last_auth = Radpostauth.objects.filter(username__iexact=request.GET.get('username'), reply='Access-Accept').order_by('authdate')
         if len(last_auth) != 0:
             status = { 'active' : True,
                        'last_successful_auth': last_auth[0].authdate.strftime('%Y-%m-%d %H:%M:%S'),
