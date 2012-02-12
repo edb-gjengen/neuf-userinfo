@@ -21,11 +21,12 @@
     <div id="container" class="container-fluid">
         {%block content%}
         {%endblock%}
-    </div>
-    <div id="footer">
-    {%block footer %}
-        <img src="{{ STATIC_URL }}style/img/DNSlogo.png" />
-    {%endblock%}
+        <div id="footer" class="row-fluid">
+        {%block footer %}
+        <a href="http://edb.neuf.no"><img src="{{ STATIC_URL }}style/img/edb_brick.png" /></a><br />
+        <a href="http://studentersamfundet.no"><img src="{{ STATIC_URL }}style/img/DNSlogo.png" /></a>
+        {%endblock%}
+        </div>
     </div>
 
     <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.7.1.min.js"></script>
