@@ -3,30 +3,33 @@
 <head>
     <title>{%block title%}Userinfo{%endblock%}</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="/static/style/stylesheets/screen.css" type="text/css" media="screen, projection" /)>
-    <link rel="stylesheet" href="/static/style/stylesheets/print.css" type="text/css" media="print" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ STATIC_URL }}style/stylesheets/screen.css" type="text/css" media="screen, projection" /)>
+    <link rel="stylesheet" href="{{ STATIC_URL }}style/stylesheets/print.css" type="text/css" media="print" />
     <!--[if lt IE 8]>
-    <link rel="stylesheet" href="/static/style/stylesheets/ie.css" type="text/css" media="screen, projection" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}style/stylesheets/ie.css" type="text/css" media="screen, projection" />
     <![endif]-->
     {%block headinc %}
     {%endblock%}
 </head>
-<body class="bp three-col">
+<body class="">
     <header id="header">
     {%block header%}
     {% include "nav.html" %}
     {%endblock%}
     </header>
-    <div id="container">
+    <div id="container" class="container-fluid">
         {%block content%}
         {%endblock%}
     </div>
     <div id="footer">
     {%block footer %}
-        <img src="/static/DNSlogo.png" />
+        <img src="{{ STATIC_URL }}style/img/DNSlogo.png" />
     {%endblock%}
     </div>
 
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap-collapse.js"></script>
     {%block tailinc %}
     {%endblock%}
 </body>

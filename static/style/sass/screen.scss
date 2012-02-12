@@ -1,81 +1,11 @@
-// This import applies a global reset to any page that imports this stylesheet.
-@import "blueprint/reset";
-
-// To configure blueprint, edit the partials/base.sass file.
-@import "partials/base";
-
-// Import all the default blueprint modules so that we can access their mixins.
-@import "blueprint";
-
-// Combine the partials into a single screen stylesheet.
-@import "partials/page";
-@import "partials/form";
-@import "partials/_col";
 @import "compass/css3";
+@import "compass_twitter_bootstrap";
+@import "compass_twitter_bootstrap_responsive";
 
 body {
-    background-color: $blueprint-background-color;
     #header {
-        nav {
-            @include box-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
-            position:fixed;
-            top:0px;
-            left:0px;
-            height:40px;
-            width:100%;
-
-            ul {
-                @include inline-block-list;
-                @include background-image(linear-gradient(bottom, #dddddd, white));
-                background-color: #eeeeee;
-                font-size: 1.3em;
-                height:100%;
-
-                li {
-                    height:100%;
-                    margin-left:20px;
-                    padding:4px;
-
-                    a {
-                        text-decoration:none;
-                        text-shadow: 0px 1px 0 rgba(0, 0, 0, 0.15);
-                    }
-                    a.non_action {
-                        color: $font-color;
-                    }
-                }
-                li.active {
-                    background-color: white;
-                    @include box-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
-
-                }
-            }
-        }
     }
     #container {
-        @include box-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
-        @include border-radius(10px);
-        position:relative;
-        top:60px;
-        padding:10px;
-        background-color:$container-background-color;
-        
-        section {
-            @include border-radius(6px);
-            //border: solid 1px $section-border-color;
-            ul {
-                min-height:100px;
-                padding-top: 4px;
-            }
-
-            h2 {
-                margin-bottom:4px;
-            }
-
-            &:hover {
-                background-color: $section-hover-color;
-            }
-        }
     }
     #footer {
         position:fixed;
@@ -83,14 +13,7 @@ body {
         left:20px;
     }
     ul.errorlist {
-        // copy some style from bp-forms .error
+        color: #B94A48;
         @include inline-list;
-        color: $error-color;
-        background-color: $error-bg-color;
-        border: solid 2px $error-border-color;
-    }
-    .ui-tooltip {
-        font-size: $blueprint-font-size - 2;
-        line-height: 1.2em;
     }
 }

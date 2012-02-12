@@ -2,9 +2,10 @@
 {% block title %}Brukerinfo{% endblock %}
 
 {% block content %}
-    <p>
-        <strong>Brukerinfo</strong> lar deg kontrollere kontoen din på <a href="http://studentersamfundet.no">Det Norske Studentersamfund</a>.
-
-        {% include "registration/login_form.html" %}
-    </p>
+<div class="row-fluid">
+    <div>
+        <strong>Brukerinfo</strong> lar deg kontrollere kontoen din på <a href="http://studentersamfundet.no">Det Norske Studentersamfund</a>.<br /><br />
+    </div>
+    {% include "registration/login_form.html" %}
+</div>
 {% endblock %}

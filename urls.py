@@ -1,4 +1,3 @@
-#from django.contrib.staticfiles.urls import staticfiles_urlpatterns # for dev
 from django.conf.urls.defaults import *
 from django.contrib import admin
 from main.forms import LDAPPasswordChangeForm, LDAPSetPasswordForm, LDAPPasswordResetForm
@@ -28,4 +27,5 @@ urlpatterns = patterns('',
     (r'^$', 'main.views.index'),
 )
 
-#urlpatterns += staticfiles_urlpatterns()
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns # for dev
+urlpatterns += staticfiles_urlpatterns()

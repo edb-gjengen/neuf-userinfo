@@ -1,5 +1,28 @@
-        <nav>
-            <ul>
-                <li><a href="/" class="non_action">Brukerinfo</a></li>{% if active %}<li class="{% if active = "profile" %}active{% endif %}"><a href="/accounts/profile">Din konto</a></li><li class="{% if active = "password_change" %}active{% endif %}"><a href="{% url django.contrib.auth.views.password_change %}">Endre passord</a></li><li class="{% if active = "logout" %}active{% endif %}"><a href="{% url main.views.logout %}">Logg ut</a></li>{% if request.user.is_superuser %}<li><a href="/admin">Administrasjon</a></li>{% endif %}{% endif %}
-            </ul>
+        <nav class="navbar">
+            <div class="navbar-inner">
+                <div class="container">
+                    <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a href="/" class="brand">Brukerinfo</a>
+                    <div class="nav-collapse">
+                        <ul class="nav">
+                            {% if active %}
+                                <li class="{% if active = "profile" %}active{% endif %}"><a href="/accounts/profile"><i class="icon-home icon-white"></i> Din konto</a></li>
+                                <li class="{% if active = "password_change" %}active{% endif %}"><a href="{% url django.contrib.auth.views.password_change %}"><i class="icon-cog icon-white"></i> Endre passord</a></li>
+                                <li class="{% if active = "logout" %}active{% endif %}"><a href="{% url main.views.logout %}">Logg ut</a></li>
+                                {% if request.user.is_superuser %}
+                                <li><a href="/admin">Administrasjon</a></li>
+                                {% endif %}
+                            {% endif %}
+                        </ul>
+                        {% if request.user.is_authenticated %}
+                            <p class="navbar-text pull-right">Logget inn som <a href="#">{{ user }}</a></p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </nav>

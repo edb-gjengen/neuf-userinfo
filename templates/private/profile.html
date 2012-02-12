@@ -1,78 +1,88 @@
 {% extends "base.html" %}
-{% block headinc %}
-    <script type="text/javascript" src="/static/js/jquery-1.6.1.min.js"></script>
-    <script type="text/javascript" src="/static/js/jquery.qtip.min.js"></script>
-
-    <link rel="stylesheet" href="/static/js/jquery.qtip.min.css" type="text/css" />
-{% endblock %}
 {%block header%}
     {% include "nav.html" with active="profile" %}
 {%endblock%}
 {% block content %}
-<script>
-$(function() {
-    var username = "{{username}}";
-    /* Display the service status of the user */
-    var img_check = ' <img src="/static/check.png" alt="OK" />';
-    var img_error = ' <img src="/static/exclamation_mark.png" alt="ERROR" />';
-    var image = '';
-    var title = '';
-
-    $.getJSON("/userstatus/client/?format=json&username="+username, function(data) {
-        if(data.active) {
-            image = img_check;
-            title = "Du har en bruker til foreningsmaskinene. \nSiste vellykkede pålogging: " + data.last_successful_auth;
-        } else {
-            image = img_error;
-            title = "Ingen konto (mangler Kerberos principal).";
-        }
-        $("#client_status").append(image).prop('title', title).qtip();
-    });
-    $.getJSON("/userstatus/wireless/?format=json&username="+username, function(data) {
-        if(data.active) {
-            image = img_check;
-            title = 'Du har tilgang til trådløst nettverk. \nSiste vellykkede pålogging: ' + data.last_successful_auth;
-        } else {
-            image = img_error;
-            title = 'Ingen trådløskonto (i Radius).';
-        }
-        $("#wireless_status").append(image).prop('title', title).qtip();
-    });
-    /* Any element with a title attribute gets a pretty qtip */
-    $("[title]").qtip();
-});
-
-</script>
-<section class="column">
-    <h2>Om deg</h2>
-    <ul>
-        <li><strong>Brukernavn:</strong> {{ldap_user.username}}</li>
-        <li><strong>Navn:</strong> {{ldap_user.full_name}}</li>
-        <li><strong>Mail:</strong> {{ldap_user.email}}</li>
-    </ul>
-</section>
-<section class="column">
-    <h2>Dine grupper</h2>
-    <ul>
-    {% if groups %}
-        <li>{{ private_group }}</li>
-        {% for group in groups %}
-        {% if group = "dns-aktiv" %}
-            <li title="Du har tilgang til foreningsmaskinene.">{{ group }}</li>
-        {% else %}
-            <li>{{ group }}</li>
-        {% endif %}
-        {% endfor %}
-    {% else %}
-        <li>Ingen grupper.</li>
-    {% endif %}
-    </ul>
-</section>
-<section class="column last">
-    <h2>Dine tjenester</h2>
-    <ul>
-        <li><span id="wireless_status">Trådløst nettverk</span></li>
-        <li><span id="client_status">Foreningsmaskiner</span></li>
-    </ul>
-</section>
+<div class="row-fluid">
+    <section class="span4">
+    <h1>Om deg</h1>
+    <div class="well">
+        <ul>
+            <li><strong>Brukernavn</strong>: {{ldap_user.username}}</li>
+            <li><strong>Navn</strong>: {{ldap_user.full_name}}</li>
+            <li><strong>Mail</strong>: {{ldap_user.email}}</li>
+        </ul>
+    </div>
+    </section>
+    <section class="span4">
+        <h2>Dine tjenester</h2>
+        <div class="well">
+            <ul>
+                <li><span id="wireless_status">Trådløst nettverk</span></li>
+                <li><span id="client_status">Foreningsmaskiner</span></li>
+            </ul>
+        </div>
+    </section>
+    <section class="span4">
+        <h2>Dine grupper</h2>
+        <div class="well">
+            <ul>
+            {% if groups %}
+                <li>{{ private_group }}</li>
+                {% for group in groups %}
+                {% if group = "dns-aktiv" %}
+                    <li title="Du har tilgang til foreningsmaskinene.">{{ group }}</li>
+                {% else %}
+                    <li>{{ group }}</li>
+                {% endif %}
+                {% endfor %}
+            {% else %}
+                <li>Ingen grupper.</li>
+            {% endif %}
+            </ul>
+        </div>
+    </section>
+</div>
 {%endblock%}
+{% block tailinc %}
+    <script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap-tooltip.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap-popover.js"></script>
+    <script>
+    $(function() {
+        /* FIXME cleanup this mess */
+        var username = "{{username}}";
+        /* Display the service status of the user */
+        var img_check = ' <img src="{{ STATIC_URL }}style/img/check.png" alt="OK" />';
+        var img_error = ' <img src="{{ STATIC_URL }}style/img/exclamation_mark.png" alt="ERROR" />';
+        var image = '';
+        var title = '';
+        var data_content = '';
+
+        $.getJSON("/userstatus/client/?format=json&username="+username, function(data) {
+            if(data.active) {
+                image = img_check;
+                title = 'Du har en bruker til foreningsmaskinene.';
+                data_content = 'Siste vellykkede pålogging: ' + data.last_successful_auth;
+            } else {
+                image = img_error;
+                title = 'Ingen konto.';
+                data_content = 'Du mangler Kerberos principal.';
+            }
+            $("#client_status").append(image).prop('title', title).attr('data-content', data_content).popover();
+        });
+        $.getJSON("/userstatus/wireless/?format=json&username="+username, function(data) {
+            if(data.active) {
+                image = img_check;
+                title = 'Du har tilgang til trådløst nettverk.';
+                data_content = 'Siste vellykkede pålogging: ' + data.last_successful_auth;
+            } else {
+                image = img_error;
+                title = 'Ingen trådløskonto.';
+                data_content = 'Du har ikke en trådløskonto i Radius.' + data.last_successful_auth;
+            }
+            $("#wireless_status").append(image).prop('title', title).attr('data-content', data_content).popover();
+        });
+    });
+
+    </script>
+{% endblock %}

@@ -115,6 +115,10 @@ AUTHENTICATION_BACKENDS = (
     'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
+# No cleaningladies.
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 60 * 15 # in seconds
+
 # LDAP server URI and BIND_DN, same as db-settings
 AUTH_LDAP_SERVER_URI = DATABASES['ldap']['NAME']
 AUTH_LDAP_BIND_DN = DATABASES['ldap']['USER']

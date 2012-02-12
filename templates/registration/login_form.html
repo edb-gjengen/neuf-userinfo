@@ -1,15 +1,28 @@
-<form method="post" action="{% url django.contrib.auth.views.login %}" class="bp">
+<form method="post" action="{% url django.contrib.auth.views.login %}">
+    <fieldset>
+        <legend></legend>
     {% if form.non_field_errors %}
         {{ form.non_field_errors }}<br />
     {% endif %}
     {% csrf_token %}
     <input type="hidden" name="next" value="{{ next }}" />
-    <label for="id_username">Brukernavn:</label><br />
-    {{ form.username }} {{ form.username.errors }}<br />
-    <label for="id_password">Passord: </label><br />
-    {{ form.password }} {{ form.password.errors }}<br />
-    <a href="{% url django.contrib.auth.views.password_reset %}">Glemt passord?</a><br />
-    <br />
-    <input type="submit" value="Logg inn" />
+    <div class="control-group">
+        <label class="control-label" for="id_username">Brukernavn:</label>
+        <div class="controls">
+            {{ form.username }} {{ form.username.errors }}
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="id_password">Passord:</label>
+        <div class="controls">
+        {{ form.password }} {{ form.password.errors }}
+        </div>
+    </div>
+    <div class="control-group">
+        <a href="{% url django.contrib.auth.views.password_reset %}">Glemt passord?</a>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Logg inn</button>
+    </div>
 
 </form>
