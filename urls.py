@@ -3,6 +3,8 @@ from django.contrib import admin
 from main.forms import LDAPPasswordChangeForm, LDAPSetPasswordForm, LDAPPasswordResetForm
 admin.autodiscover()
 
+import settings
+
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -16,7 +18,8 @@ urlpatterns = patterns('',
     (r'^accounts/password/change/done$', 'django.contrib.auth.views.password_change_done'),
     # Reset password (forgot password)
     (r'^accounts/password/reset$', 'django.contrib.auth.views.password_reset',
-        {'password_reset_form' : LDAPPasswordResetForm}),
+        {'password_reset_form' : LDAPPasswordResetForm,
+         'from_email' : settings.FROM_EMAIL}),
     (r'^accounts/password/reset/done$', 'django.contrib.auth.views.password_reset_done'),
     # Set password
     (r'^accounts/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)$', 'main.views.password_reset_confirm',

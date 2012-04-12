@@ -111,6 +111,10 @@ INSTALLED_APPS = (
     'ldapdb',
     'django.contrib.admin',
 )
+
+EMAIL_HOST = 'snes.neuf.no'
+FROM_EMAIL = 'no-reply@neuf.no'
+
 AUTHENTICATION_BACKENDS = (
     'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',

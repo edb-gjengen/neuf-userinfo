@@ -1,5 +1,6 @@
 *.swp
 *.pyc
 settings.py
+settings_brukerinfo.py
 test.db
 static/style/.sass-cache/
