@@ -105,7 +105,7 @@ def password_reset_confirm(request, uidb36=None, token=None,
     form for entering a new password.
 
     Note: this is the same view as django.contrib.auth.views.password_reset_confirm
-        with only minor changes.
+        with only minor changes for LDAP-lookup.
     """
     assert uidb36 is not None and token is not None # checked by URLconf
     if post_reset_redirect is None:
