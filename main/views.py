@@ -56,7 +56,7 @@ def user_profile(request, username):
         return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
 
     groups = LdapGroup.objects.filter(usernames__contains=username)
-    private_group = LdapGroup.objects.filter(gid=ldap_user.group)[0]
+    private_group = LdapGroup.objects.get(gid=ldap_user.group)[0]
 
     return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
 

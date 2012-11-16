@@ -15,7 +15,7 @@ foreach($users as $user) {
         $user_id = username_exists( $username );
         if ( !$user_id ) {
                 $user_id = wp_insert_user($userdata);
-                echo "[new] $user_id : $username,$first_name,$last_name";
+                echo "[new] $user_id : $username,$first_name,$last_name\n";
         } else {
                 //echo "$user_id\n";
         }
