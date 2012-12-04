@@ -10,12 +10,13 @@ foreach($users as $user) {
         $userdata = array(
                 'user_login' => $username,
                 'user_pass' => $pass,
+                'user_email' => $email,
                 'first_name' => $first_name,
                 'last_name' => $last_name);
         $user_id = username_exists( $username );
         if ( !$user_id ) {
                 $user_id = wp_insert_user($userdata);
-                echo "[new] $user_id : $username,$first_name,$last_name\n";
+                echo "[new] $user_id : $username,$first_name,$last_name,$email\n";
                 /* LDAP login flag */
                 $flagged = add_user_meta( $user_id, "wpDirAuthFlag", "1");
                 echo $flagged == false ? "\t$user_id not flagged\n" : "";
