@@ -1,3 +1,4 @@
+# coding: utf-8
 from django.contrib.auth.forms import SetPasswordForm, PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
