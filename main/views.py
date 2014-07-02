@@ -35,7 +35,7 @@ def index(request):
 
 @login_required
 def profile(request):
-    username = request.user
+    username = request.user.username
     ldap_user = None
     try:
         ldap_user = LdapUser.objects.get(username=username)

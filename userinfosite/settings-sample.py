@@ -54,6 +54,10 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'userinfosite.urls'
 
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'templates/'),
+)
+
 WSGI_APPLICATION = 'userinfosite.wsgi.application'
 
 
@@ -82,6 +86,14 @@ DATABASES = {
         'NAME': 'radius',                # Or path to database file if using sqlite3.
         'USER': 'radius',                # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': 'localhost',             # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    },
+    'inside': {
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'dev_inside',                # Or path to database file if using sqlite3.
+        'USER': 'dev',                # Not used with sqlite3.
+        'PASSWORD': 'dev',                  # Not used with sqlite3.
         'HOST': 'localhost',             # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
