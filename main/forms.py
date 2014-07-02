@@ -8,6 +8,7 @@ from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext as _
+import sys
 
 from models import *
 from validators import PasswordValidator
@@ -85,5 +86,9 @@ class LDAPPasswordResetForm(PasswordResetForm):
             # Email subject *must not* contain newlines
             subject = ''.join(subject.splitlines())
             email = loader.render_to_string(email_template_name, c)
+            if sys.version_info < (2, 6, 6):
+                # Workaround for http://bugs.python.org/issue1368247 ?
+                email = email.encode('utf-8')
+
             send_mail(subject, email, from_email, [user.email])
 
