@@ -18,7 +18,8 @@ urlpatterns = patterns('',
     url(r'^accounts/password/change/done$', 'django.contrib.auth.views.password_change_done', name='password_change_done'),
     # Reset password (forgot password)
     url(r'^accounts/password/reset$', 'django.contrib.auth.views.password_reset',
-        { 'password_reset_form' : LDAPPasswordResetForm }),
+        { 'password_reset_form' : LDAPPasswordResetForm,
+          'from_email' : settings.DEFAULT_FROM_EMAIL }),
     url(r'^accounts/password/reset/done$', 'django.contrib.auth.views.password_reset_done', name='password_reset_done'),
     # Set password
     url(r'^accounts/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)$',

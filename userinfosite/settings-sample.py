@@ -127,7 +127,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SITE_ID = 1
 
 EMAIL_HOST = 'snes.neuf.no'
-DEFAULT_FROM_EMAIL = 'no-reply@neuf.no'
+EMAIL_PORT = 25
+DEFAULT_FROM_EMAIL = 'noreply@neuf.no'
 
 AUTHENTICATION_BACKENDS = (
     'django_auth_ldap.backend.LDAPBackend',

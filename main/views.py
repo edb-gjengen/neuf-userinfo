@@ -1,19 +1,21 @@
 # coding: utf-8
 import json
 
-from django.http import HttpResponse, HttpResponseRedirect
-from django.contrib.auth import login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import SetPasswordForm, AuthenticationForm
+from django.contrib.auth import login, logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response, get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response, get_object_or_404, resolve_url
 from django.template import RequestContext
-from django.utils.http import base36_to_int
+from django.template.response import TemplateResponse
+from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
 
 from forms import LDAPPasswordResetForm
 from models import *
@@ -92,9 +94,11 @@ def logout(request):
     auth_logout(request)
     return render_to_response('registration/logout.html', locals(), context_instance=RequestContext(request))
 
+
 # Doesn't need csrf_protect since no-one can guess the URL
+@sensitive_post_parameters()
 @never_cache
-def password_reset_confirm(request, uidb36=None, token=None,
+def password_reset_confirm(request, uidb64=None, token=None,
                            template_name='registration/password_reset_confirm.html',
                            token_generator=default_token_generator,
                            set_password_form=SetPasswordForm,
@@ -107,13 +111,15 @@ def password_reset_confirm(request, uidb36=None, token=None,
     Note: this is the same view as django.contrib.auth.views.password_reset_confirm
         with only minor changes for LDAP-lookup.
     """
-    assert uidb36 is not None and token is not None # checked by URLconf
+    assert uidb64 is not None and token is not None  # checked by URLconf
     if post_reset_redirect is None:
-        post_reset_redirect = reverse('django.contrib.auth.views.password_reset_complete')
+        post_reset_redirect = reverse('password_reset_complete')
+    else:
+        post_reset_redirect = resolve_url(post_reset_redirect)
     try:
-        uid_int = base36_to_int(uidb36)
-        user = LdapUser.objects.get(id=uid_int) # Diff line vs internal django view 
-    except (ValueError, User.DoesNotExist):
+        uid = urlsafe_base64_decode(uidb64)
+        user = LdapUser.objects.get(id=uid) # Diff line vs internal django view 
+    except (TypeError, ValueError, OverflowError, LdapUser.DoesNotExist):
         user = None
 
     if user is not None and token_generator.check_token(user, token):
@@ -132,7 +138,7 @@ def password_reset_confirm(request, uidb36=None, token=None,
         'form': form,
         'validlink': validlink,
     }
-    context.update(extra_context or {})
-    return render_to_response(template_name, context,
-                              context_instance=RequestContext(request, current_app=current_app))
-
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context,
+                            current_app=current_app)
