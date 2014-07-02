@@ -118,7 +118,7 @@ def password_reset_confirm(request, uidb64=None, token=None,
         post_reset_redirect = resolve_url(post_reset_redirect)
     try:
         uid = urlsafe_base64_decode(uidb64)
-        user = LdapUser.objects.get(id=uid) # Diff line vs internal django view 
+        user = LdapUser.objects.get(pk=uid) # Diff line vs internal django view 
     except (TypeError, ValueError, OverflowError, LdapUser.DoesNotExist):
         user = None
 
