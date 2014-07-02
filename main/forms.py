@@ -15,10 +15,13 @@ class LDAPSetPasswordForm(SetPasswordForm):
         # set radius password
         set_radius = utils.set_radius_password(self.user.username, self.cleaned_data['new_password1'])
 
+        # set inside password
+        set_inside = utils.set_inside_password(self.user.username, self.cleaned_data['new_password1'])
+
         # Lookup the Ldap user with the identical username (1-to-1).
         self.user = LdapUser.objects.get(username=self.user.username)
 
-        self.user.set_password(self.cleaned_data['new_password1'])
+        #self.user.set_password(self.cleaned_data['new_password1'])
         if commit:
             self.user.save()
 
@@ -28,7 +31,7 @@ class LDAPSetPasswordForm(SetPasswordForm):
 
     def clean_new_password1(self):
         raw_password = self.cleaned_data.get('new_password1')
-        # Validation here?
+        # Validation here
         MinLengthValidator(8)(raw_password)
         PasswordValidator(raw_password)
         return raw_password

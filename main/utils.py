@@ -1,13 +1,12 @@
 # coding: utf-8
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from subprocess import Popen, PIPE
 import datetime
 import re
 
-from subprocess import Popen, PIPE
-from django.core.exceptions import ObjectDoesNotExist
-
 from models import Radcheck
 import passwd
-import settings
 
 def get_kerberos_principal(username):
     principal = u"{0}@{1}".format(username, settings.KERBEROS_REALM)
@@ -60,6 +59,38 @@ def set_radius_password(username, raw_password):
 
     radius_user.value = passwd.radius_create(raw_password)
     radius_user.save()
+    return True
+
+def log_inside_userupdate(username, message):
+    from django.db import connections
+    c = connections['inside'].cursor()
+
+    # TODO errorhandling
+    try:
+        c.execute("SELECT id FROM din_user WHERE username= %s", [username])
+        row = c.fetchone()
+        if row is not None:
+            user_id = row[0]
+            c.execute(
+                "INSERT INTO din_userupdate (date, user_id_updated, comment, user_id_updated_by) VALUES (NOW(), %s, %s, %s)",
+                [user_id, message, user_id])
+    finally:
+        c.close()
+
+    return True
+
+def set_inside_password(username, raw_password):
+    from django.db import connections
+    c = connections['inside'].cursor()
+
+    # TODO errorhandling
+    try:
+        c.execute("UPDATE din_user SET password=PASSWORD(%s) WHERE username=%s", [raw_password, username])
+    finally:
+        c.close()
+
+    log_inside_userupdate(username, u"Satt passord på nytt via brukerinfo.neuf.no.")
+
     return True
 
 def format_krb5_date(date):

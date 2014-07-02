@@ -1,5 +1,5 @@
 # coding: utf-8
-import simplejson as json
+import json
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, logout as auth_logout

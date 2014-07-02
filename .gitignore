@@ -1,6 +1,6 @@
 *.swp
 *.pyc
 settings.py
-settings_brukerinfo.py
-test.db
+db.sqlite3
 static/style/.sass-cache/
+venv

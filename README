@@ -1,14 +1,15 @@
-INSTALL
-=======
-Newer Ubuntus/Debians (11.04+/6.0+):
- - apt-get install python-django python-ldap python-sqlite python-django-auth-ldap
-Other:
- - Get latest python-django from http://djangoproject.com
- - Get latest django-auth-ldap from http://pypi.python.org/pypi/django-auth-ldap/1.0.11
- - Unpack and run: 'python setup.py install' in both dirs.
+# Installation
 
-Apache:
+    apt-get install libldap2-dev python-dev libmysqlclient-dev
+    virtualenv venv
+    . venv/bin/activate
+    pip install -r requirements.txt
+    cp userinfosite/settings-sample.py userinfosite/settings.py
+    python manage.py syncdb
+    # create the radius database tables, if they don't exist already
+    python manage.py syncdb --database=radius
+    python manage.py runserver
+
+# Apache:
  - Make a Vhost
- - add  WSGIScriptAlias / /path/to/project/neuf-userinfo/neuf-userinfo.wsgi
-
-More...
+ - add WSGIScriptAlias / /path/to/project/neuf-userinfo/userinfosite/wsgi.py
