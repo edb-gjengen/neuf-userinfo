@@ -28,7 +28,8 @@ class LDAPSetPasswordForm(SetPasswordForm):
         # Lookup the Ldap user with the identical username (1-to-1).
         self.user = LdapUser.objects.get(username=self.user.username)
 
-        #self.user.set_password(self.cleaned_data['new_password1'])
+        # set ldap password
+        self.user.set_password(self.cleaned_data['new_password1'])
         if commit:
             self.user.save()
 
