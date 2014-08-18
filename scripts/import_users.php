@@ -21,7 +21,7 @@ foreach($users as $user) {
         if ( !$user_id ) {
                 $user_id = wp_insert_user($userdata);
                 if ( is_wp_error($user_id) ) {
-                        echo $result->get_error_message();
+                        echo $user_id->get_error_message();
                         continue;
                 }
                 echo "[$site_name][new] $user_id : $username,$first_name,$last_name,$email\n";
