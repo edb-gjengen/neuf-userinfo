@@ -17,8 +17,17 @@ out_file = codecs.open(OUT_FILENAME, "w", encoding="utf-8")
 json.dump(users_out, out_file, ensure_ascii=False)
 out_file.close()
 
-cmd = "php "+PHP_SCRIPT_PATH+"/import_users.php " + OUT_FILENAME
-proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-script_response = proc.stdout.read()
-print script_response
+wp_load_paths = [
+    "/var/www/studentersamfundet.no/www/wp/wp-load.php",
+    "/var/www/neuf.no/aktivweb/wp-load.php"
+]
+for load_path in wp_load_paths:
+    cmd = "php {0} {1} {2}".format(
+        os.path.join(PHP_SCRIPT_PATH, "import_users.php"),
+        OUT_FILENAME,
+        load_path
+    )
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    script_response = proc.stdout.read()
+    print script_response,
 
