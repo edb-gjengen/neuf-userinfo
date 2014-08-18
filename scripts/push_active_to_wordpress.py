@@ -1,7 +1,6 @@
 import json, codecs, subprocess, os
-from django.core.management import setup_environ
-import settings
-setup_environ(settings)
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "userinfosite.settings")
+from django.conf import settings
 
 from main.models import *
 
