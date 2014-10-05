@@ -13,3 +13,9 @@
 # Apache:
  - Make a Vhost
  - add WSGIScriptAlias / /path/to/project/neuf-userinfo/userinfosite/wsgi.py
+
+# External dependencies:
+ - LDAP: Read the tutorial on [Howto setup a LDAP server with Docker](https://edb.neuf.no/wiki/index.php?title=Howto_setup_a_LDAP_server_with_Docker)
+ - Kerberos: TODO
+ - RADIUS: TODO
+ - Inside: Going away
