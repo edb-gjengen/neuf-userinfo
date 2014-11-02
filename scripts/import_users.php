@@ -1,6 +1,6 @@
 <?php
 function _log($msg) {
-    echo "[".date('r')."] ".$msg;
+    echo "[".date('r')."] ".$msg."\n";
 }
 
 $filename = $argv[1];
@@ -27,11 +27,11 @@ foreach($users as $user) {
             _log("[$site_name][error] ".$user_id->get_error_message()."(username: $username)");
             continue;
         }
-        _log("[$site_name][new] $user_id : $username,$first_name,$last_name,$email\n");
+        _log("[$site_name][new] $user_id : $username,$first_name,$last_name,$email");
         /* LDAP login flag */
         $flagged = add_user_meta( $user_id, "wpDirAuthFlag", "1");
         if( !$flagged ) {
-            _log("$user_id not flagged\n");
+            _log("$user_id not flagged");
         }
     }
 }
