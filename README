@@ -19,3 +19,8 @@
  - Kerberos: TODO
  - RADIUS: TODO
  - Inside: Going away
+
+
+# TODO
+ - finish auth backend.
+ - allow non LDAP-users (conditional LDAP-stuff), because we don't want LDAP filled with non-active members

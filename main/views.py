@@ -38,14 +38,15 @@ def index(request):
 @login_required
 def profile(request):
     username = request.user.username
+    groups = request.user.groups.all()
     ldap_user = None
     try:
         ldap_user = LdapUser.objects.get(username=username)
     except:
         return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
 
-    groups = LdapGroup.objects.filter(usernames__contains=username)
-    private_group = LdapGroup.objects.get(gid=ldap_user.group)
+    ldap_groups = LdapGroup.objects.filter(usernames__contains=username)
+    ldap_private_group = LdapGroup.objects.get(gid=ldap_user.group)
 
     return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
 

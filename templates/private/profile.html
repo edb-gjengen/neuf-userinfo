@@ -8,9 +8,9 @@
     <h2>Om deg</h2>
     <div class="well">
         <ul>
-            <li><strong>Brukernavn</strong>: {{ldap_user.username}}</li>
-            <li><strong>Navn</strong>: {{ldap_user.full_name}}</li>
-            <li><strong>Mail</strong>: {{ldap_user.email}}</li>
+            <li><strong>Brukernavn</strong>: {{user.username}}</li>
+            <li><strong>Navn</strong>: {{user.first_name}} {{user.last_name}}</li>
+            <li><strong>Mail</strong>: {{user.email}}</li>
         </ul>
     </div>
     </section>
@@ -28,7 +28,7 @@
         <div class="well">
             <ul>
             {% if groups %}
-                <li>{{ private_group }}</li>
+                {% if ldap_private_group %}<li>{{ ldap_private_group }}</li>{% endif %}
                 {% for group in groups %}
                 {% if group = "dns-aktiv" %}
                     <li title="Du har tilgang til foreningsmaskinene.">{{ group }}</li>
