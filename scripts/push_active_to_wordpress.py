@@ -4,7 +4,7 @@ from django.conf import settings
 
 from main.models import *
 
-PHP_SCRIPT_PATH = '/opt/django/neuf-userinfo/scripts'
+PHP_SCRIPT_PATH = '/var/www/neuf.no/userinfo/scripts'
 OUT_FILENAME = os.path.join(PHP_SCRIPT_PATH,"users_in_group_active.json")
 
 usernames = LdapGroup.objects.get(name="dns-aktiv").usernames

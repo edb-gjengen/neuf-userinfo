@@ -7,7 +7,7 @@
     {% csrf_token %}
     <input type="hidden" name="next" value="{{ next }}" />
     <div class="control-group">
-        <label class="control-label" for="id_username">Brukernavn:</label>
+        <label class="control-label" for="id_username">Epost / Brukernavn:</label>
         <div class="controls">
             {{ form.username }} {{ form.username.errors }}
         </div>

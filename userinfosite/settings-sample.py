@@ -131,7 +131,8 @@ EMAIL_PORT = 25
 DEFAULT_FROM_EMAIL = 'noreply@neuf.no'
 
 AUTHENTICATION_BACKENDS = (
-    'django_auth_ldap.backend.LDAPBackend',
+    'main.backends.LDAPEmailBackend',
+    'main.backends.LDAPUsernameBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 # No cleaningladies.
@@ -139,46 +140,58 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 60 * 15 # in seconds
 
 # LDAP server URI and BIND_DN, same as db-settings
-AUTH_LDAP_SERVER_URI = DATABASES['ldap']['NAME']
-AUTH_LDAP_BIND_DN = DATABASES['ldap']['USER']
-AUTH_LDAP_BIND_PASSWORD = DATABASES['ldap']['PASSWORD']
+AUTH_LDAP_U_SERVER_URI = DATABASES['ldap']['NAME']
+AUTH_LDAP_U_BIND_DN = DATABASES['ldap']['USER']
+AUTH_LDAP_U_BIND_PASSWORD = DATABASES['ldap']['PASSWORD']
 
 import ldap
 from django_auth_ldap.config import LDAPSearch, PosixGroupType
 
 # Basic user auth
-AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=People,dc=neuf,dc=no",
-    ldap.SCOPE_ONELEVEL, "(uid=%(user)s)")
-AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=People,dc=neuf,dc=no"
+AUTH_LDAP_U_USER_SEARCH = LDAPSearch("ou=People,dc=neuf,dc=no", ldap.SCOPE_ONELEVEL, "(uid=%(user)s)")
 # Basic groups
-AUTH_LDAP_GROUP_SEARCH = LDAPSearch("ou=Groups,dc=neuf,dc=no",
-    ldap.SCOPE_ONELEVEL, "(objectClass=posixGroup)"
-)
-AUTH_LDAP_GROUP_TYPE = PosixGroupType()
+AUTH_LDAP_U_GROUP_SEARCH = LDAPSearch("ou=Groups,dc=neuf,dc=no", ldap.SCOPE_ONELEVEL, "(objectClass=posixGroup)")
+AUTH_LDAP_U_GROUP_TYPE = PosixGroupType()
 # Mirror groups on each auth
-AUTH_LDAP_MIRROR_GROUPS = True
+AUTH_LDAP_U_MIRROR_GROUPS = True
 # Group to user flag mappings
-AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+AUTH_LDAP_U_USER_FLAGS_BY_GROUP = {
     "is_active": "cn=dns-alle,ou=Groups,dc=neuf,dc=no",
     "is_staff": "cn=edb,ou=Groups,dc=neuf,dc=no",
     "is_superuser": "cn=edbadmin,ou=Groups,dc=neuf,dc=no"
 }
 # Group to profile flag mappings, not used.
-AUTH_LDAP_PROFILE_FLAGS_BY_GROUP = {
+AUTH_LDAP_U_PROFILE_FLAGS_BY_GROUP = {
     #"is_edb": "cn=edb,ou=Groups,dc=neuf,dc=no"
 }
 # User attribute mappings
-AUTH_LDAP_USER_ATTR_MAP = {
+AUTH_LDAP_U_USER_ATTR_MAP = {
     "first_name": "givenName",
     "last_name": "sn",
     "email": "mail",
 }
 # User profile attribute mappings
-AUTH_LDAP_PROFILE_ATTR_MAP = {
+AUTH_LDAP_U_PROFILE_ATTR_MAP = {
     "home_directory": "homeDirectory"
 }
 # Allways update the django user object on authentication.
-AUTH_LDAP_ALWAYS_UPDATE_USER = True
+AUTH_LDAP_U_ALWAYS_UPDATE_USER = True
+
+# Email LDAP auth
+AUTH_LDAP_E_SERVER_URI = AUTH_LDAP_U_SERVER_URI
+AUTH_LDAP_E_BIND_DN = AUTH_LDAP_U_BIND_DN
+AUTH_LDAP_E_BIND_PASSWORD = AUTH_LDAP_U_BIND_PASSWORD
+
+AUTH_LDAP_E_USER_SEARCH = LDAPSearch("ou=People,dc=neuf,dc=no", ldap.SCOPE_ONELEVEL, "(mail=%(user)s)")
+
+AUTH_LDAP_E_GROUP_SEARCH = AUTH_LDAP_U_GROUP_SEARCH
+AUTH_LDAP_E_GROUP_TYPE = AUTH_LDAP_U_GROUP_TYPE
+AUTH_LDAP_E_MIRROR_GROUPS = AUTH_LDAP_U_MIRROR_GROUPS
+AUTH_LDAP_E_USER_FLAGS_BY_GROUP = AUTH_LDAP_U_USER_FLAGS_BY_GROUP
+AUTH_LDAP_E_PROFILE_FLAGS_BY_GROUP = AUTH_LDAP_U_PROFILE_FLAGS_BY_GROUP
+AUTH_LDAP_E_USER_ATTR_MAP = AUTH_LDAP_U_USER_ATTR_MAP
+AUTH_LDAP_E_PROFILE_ATTR_MAP = AUTH_LDAP_U_PROFILE_ATTR_MAP
+AUTH_LDAP_E_ALWAYS_UPDATE_USER = AUTH_LDAP_U_ALWAYS_UPDATE_USER
 
 # Debug logging
 import logging

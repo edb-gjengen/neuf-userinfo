@@ -1,6 +1,6 @@
 # Installation
 
-    apt-get install libldap2-dev python-dev libmysqlclient-dev libsasl2-dev libldap2-dev libssl-dev
+    apt-get install libldap2-dev python-dev libmysqlclient-dev libsasl2-dev libldap2-dev libssl-dev ldap-utils
     virtualenv venv
     . venv/bin/activate
     pip install -r requirements.txt
@@ -10,9 +10,11 @@
     python manage.py syncdb --database=radius
     python manage.py runserver
 
-# Apache:
- - Make a Vhost
- - add WSGIScriptAlias / /path/to/project/neuf-userinfo/userinfosite/wsgi.py
+## LDAP
+    sudo docker run -e LDAP_DOMAIN=neuf.no -e LDAP_ORGANISATION="Neuf" -e LDAP_ROOTPASS="toor" -p 389:389 -d osixia/openldap
+    ldapadd -D "cn=admin,dc=neuf,dc=no" -w "toor" -f testdata.ldif
+    # Verify import
+    ldapsearch -x -b dc=neuf,dc=no
 
 # External dependencies:
  - LDAP: Read the tutorial on [Howto setup a LDAP server with Docker](https://edb.neuf.no/wiki/index.php?title=Howto_setup_a_LDAP_server_with_Docker)
