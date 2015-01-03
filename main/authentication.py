@@ -11,7 +11,7 @@ class InsideBackend(object):
         row = None
         cur = connections['inside'].cursor()
         try:
-            cur.execute("SELECT id,firstname,lastname,email FROM din_user WHERE password=PASSWORD(%s) AND (username=%s OR email=%s)", [password, username, username])
+            cur.execute("SELECT id,ldap_username,firstname,lastname,email FROM din_user WHERE password=PASSWORD(%s) AND (ldap_username=%s OR email=%s)", [password, username, username])
             row = cur.fetchone()
         except Exception as e:
             # FIXME errorhandling
@@ -21,6 +21,7 @@ class InsideBackend(object):
             cur.close()
 
         if row:
+            username = row[1]
             try:
                 user = User.objects.get(username=username)
             except User.DoesNotExist:
@@ -41,7 +42,7 @@ class InsideBackend(object):
             return None
 
     def _update_user_details(self, user, row):
-        uid, first_name, last_name, email = row
+        uid, username, first_name, last_name, email = row
         user.first_name = first_name
         user.last_name = last_name
         user.email = email
@@ -62,7 +63,7 @@ class InsideBackend(object):
                 user.groups.add(g)
 
             # Remove old relationships
-            # TODO: if setting is set, not tested
+            # TODO: if setting is set. not tested
             for g in existing_groups:
                 if g.name not in groups:
                     user.groups.remove(g)
