@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import unicode_literals
 from django.contrib.auth.forms import SetPasswordForm, PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
@@ -9,50 +10,53 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext as _
 import sys
+from inside.models import InsideUser
+from inside.utils import set_inside_password
 
 from models import *
 from validators import PasswordValidator
-import utils 
+from neuf_userinfo.utils import set_kerberos_password, set_radius_password
 
-class LDAPSetPasswordForm(SetPasswordForm):
+
+class NeufSetPasswordForm(SetPasswordForm):
     def save(self, commit=True):
-        # set kerberos password
-        set_krb5 = utils.set_kerberos_password(self.user.username, self.cleaned_data['new_password1'])
-        
-        # set radius password
-        set_radius = utils.set_radius_password(self.user.username, self.cleaned_data['new_password1'])
 
-        # set inside password
-        set_inside = utils.set_inside_password(self.user.username, self.cleaned_data['new_password1'])
+        # Membership database
+        set_inside_password(self.user.username, self.cleaned_data['new_password1'])
 
-        # Lookup the Ldap user with the identical username (1-to-1).
+        # Active services
+        set_kerberos_password(self.user.username, self.cleaned_data['new_password1'])
+        set_radius_password(self.user.username, self.cleaned_data['new_password1'])
+
+        # LDAP: Lookup the Ldap user with the identical username (1-to-1).
         self.user = LdapUser.objects.get(username=self.user.username)
-
-        # set ldap password
         self.user.set_password(self.cleaned_data['new_password1'])
         if commit:
             self.user.save()
 
-        # TODO: Log the result of the above.
-        
         return self.user
 
     def clean_new_password1(self):
         raw_password = self.cleaned_data.get('new_password1')
-        # Validation here
+
         MinLengthValidator(8)(raw_password)
         PasswordValidator(raw_password)
+
         return raw_password
 
-class LDAPPasswordChangeForm(LDAPSetPasswordForm):
+
+class NeufPasswordChangeForm(NeufSetPasswordForm):
     pass
 
-class LDAPPasswordResetForm(PasswordResetForm):
+
+class NeufPasswordResetForm(PasswordResetForm):
+    EMAIL_ERROR_MSG = "That e-mail address doesn't have an associated user account. Are you sure you've registered?"
+
     def clean_email(self):
         email = self.cleaned_data["email"].lower()
-        self.users_cache = LdapUser.objects.filter(email=email)
+        self.users_cache = InsideUser.objects.filter(email=email)
         if len(self.users_cache) == 0:
-            raise forms.ValidationError(_("That e-mail address doesn't have an associated user account. Are you sure you've registered?"))
+            raise forms.ValidationError(_(self.EMAIL_ERROR_MSG))
         return email
 
     def save(self, domain_override=None,
@@ -88,8 +92,7 @@ class LDAPPasswordResetForm(PasswordResetForm):
             subject = ''.join(subject.splitlines())
             email = loader.render_to_string(email_template_name, c)
             if sys.version_info < (2, 6, 6):
-                # Workaround for http://bugs.python.org/issue1368247 ?
+                # Workaround for http://bugs.python.org/issue1368247
                 email = email.encode('utf-8')
 
             send_mail(subject, email, from_email, [user.email])
-

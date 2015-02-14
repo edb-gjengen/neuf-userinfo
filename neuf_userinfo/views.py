@@ -1,25 +1,22 @@
 # coding: utf-8
-import json
-
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import SetPasswordForm, AuthenticationForm
 from django.contrib.auth import login, logout as auth_logout
-from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404, resolve_url
+from django.shortcuts import render_to_response, resolve_url, render
 from django.template import RequestContext
 from django.template.response import TemplateResponse
 from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+import json
+from inside.models import InsideUser
 
-from forms import LDAPPasswordResetForm
 from models import *
 import utils
+
 
 def index(request):
     if request.method == "POST":
@@ -29,11 +26,12 @@ def index(request):
             login(request, form.get_user())
     else:
         if request.user.is_authenticated():
-            return HttpResponseRedirect( reverse('main.views.profile') )
+            return HttpResponseRedirect(reverse('neuf_userinfo.views.profile'))
         else:
             form = AuthenticationForm(request)
 
     return render_to_response('public/index.html', locals(), context_instance=RequestContext(request))
+
 
 @login_required
 def profile(request):
@@ -42,7 +40,7 @@ def profile(request):
     ldap_user = None
     try:
         ldap_user = LdapUser.objects.get(username=username)
-    except:
+    except LdapUser.DoesNotExist:
         return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
 
     ldap_groups = LdapGroup.objects.filter(usernames__contains=username)
@@ -50,12 +48,13 @@ def profile(request):
 
     return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
 
+
 @permission_required('main.is_superuser')
 def user_profile(request, username):
     ldap_user = None
     try:
         ldap_user = LdapUser.objects.get(username=username)
-    except:
+    except LdapUser.DoesNotExist:
         return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
 
     groups = LdapGroup.objects.filter(usernames__contains=username)
@@ -63,37 +62,42 @@ def user_profile(request, username):
 
     return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
 
-#todo security
+
+# TODO security
 def client_status(request):
     krb5_principal = utils.get_kerberos_principal(request.GET.get('username'))
     if krb5_principal:
         last_succ_auth = utils.format_krb5_date(krb5_principal['Last successful authentication'])
-        status = { 'active' : True,
-                   'last_successful_auth' : last_succ_auth,
-                   'last_modified' : krb5_principal['Last modified'] }
+        status = {
+            'active': True,
+            'last_successful_auth': last_succ_auth,
+            'last_modified': krb5_principal['Last modified']
+        }
     else:
-        status = { 'active' : False }
+        status = {'active': False}
     return HttpResponse(json.dumps(status), content_type='application/javascript; charset=utf8')
 
-#todo security
+
+# TODO security
 def wireless_status(request):
+    username = request.GET.get('username')
     try:
-        radius_user = Radcheck.objects.get(username=request.GET.get('username'))
-        # get last authentication
-        last_auth = Radpostauth.objects.filter(username__iexact=request.GET.get('username'), reply='Access-Accept').order_by('authdate')
-        if len(last_auth) != 0:
-            status = { 'active' : True,
-                       'last_successful_auth': last_auth[0].authdate.strftime('%Y-%m-%d %H:%M:%S'),
-                       'hash': radius_user.attribute }
-        else:
-            status = { 'active' : True, 'hash': radius_user.attribute }
-    except ObjectDoesNotExist:
-        status = { 'active' : False }
+        radius_user = Radcheck.objects.get(username=username)
+    except Radcheck.ObjectDoesNotExist:
+        return HttpResponse(json.dumps({'active': False}), content_type='application/javascript; charset=utf8')
+
+    # get last authentication
+    last_auth = Radpostauth.objects.filter(username__iexact=username, reply='Access-Accept').order_by('authdate')
+    status = {'active': True, 'hash': radius_user.attribute}
+    if len(last_auth) != 0:
+        status['last_successful_auth'] = last_auth[0].authdate.strftime('%Y-%m-%d %H:%M:%S')
+
     return HttpResponse(json.dumps(status), content_type='application/javascript; charset=utf8')
+
 
 def logout(request):
     auth_logout(request)
-    return render_to_response('registration/logout.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'registration/logout.html')
 
 
 # Doesn't need csrf_protect since no-one can guess the URL
@@ -119,8 +123,8 @@ def password_reset_confirm(request, uidb64=None, token=None,
         post_reset_redirect = resolve_url(post_reset_redirect)
     try:
         uid = urlsafe_base64_decode(uidb64)
-        user = LdapUser.objects.get(pk=uid) # Diff line vs internal django view 
-    except (TypeError, ValueError, OverflowError, LdapUser.DoesNotExist):
+        user = InsideUser.objects.get(pk=uid)  # Diff line vs internal django view
+    except (TypeError, ValueError, OverflowError, InsideUser.DoesNotExist):
         user = None
 
     if user is not None and token_generator.check_token(user, token):

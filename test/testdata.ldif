@@ -9,8 +9,8 @@ dn: uid=test,ou=People,dc=neuf,dc=no
 objectClass: inetOrgPerson
 objectClass: posixAccount
 objectClass: shadowAccount
-uid: testesen
-gecos: testesen
+uid: test
+gecos: test
 loginShell: /bin/bash
 shadowExpire: -1
 shadowFlag: 0

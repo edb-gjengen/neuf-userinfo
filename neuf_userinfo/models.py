@@ -1,8 +1,9 @@
-from ldapdb.models.fields import CharField, ImageField, IntegerField, ListField
+import datetime
 from django.db import models
 import ldapdb.models
+from ldapdb.models.fields import CharField, ImageField, IntegerField, ListField
 import passwd
-import datetime
+
 
 class LdapUser(ldapdb.models.Model):
     """
@@ -12,7 +13,7 @@ class LdapUser(ldapdb.models.Model):
     connection_name = 'ldap'
 
     # LDAP meta-data
-    base_dn = "ou=People,dc=neuf,dc=no" # CONFIG
+    base_dn = "ou=People,dc=neuf,dc=no"  # FXIME: CONFIG
     object_classes = ['inetOrgPerson', 'posixAccount', 'shadowAccount']
 
     # inetOrgPerson
@@ -25,9 +26,9 @@ class LdapUser(ldapdb.models.Model):
     photo = ImageField(db_column='jpegPhoto')
 
     # posixAccount
-    id = IntegerField(db_column='uidNumber', unique=True) # referenced in reset password form
+    id = IntegerField(db_column='uidNumber', unique=True)  # referenced in reset password form
     group = IntegerField(db_column='gidNumber')
-    gecos =  CharField(db_column='gecos')
+    gecos = CharField(db_column='gecos')
     home_directory = CharField(db_column='homeDirectory')
     login_shell = CharField(db_column='loginShell', default='/bin/bash')
     username = CharField(db_column='uid', primary_key=True)
@@ -55,6 +56,7 @@ class LdapUser(ldapdb.models.Model):
     def __unicode__(self):
         return self.full_name
 
+
 class LdapGroup(ldapdb.models.Model):
     """
     Class for representing an LDAP group entry.
@@ -63,7 +65,7 @@ class LdapGroup(ldapdb.models.Model):
     connection_name = 'ldap'
 
     # LDAP meta-data
-    base_dn = "ou=Groups,dc=neuf,dc=no" # CONFIG
+    base_dn = "ou=Groups,dc=neuf,dc=no"  # CONFIG
     object_classes = ['posixGroup']
 
     # posixGroup attributes
@@ -116,8 +118,10 @@ class Radacct(models.Model):
     acctstartdelay = models.IntegerField(null=True, blank=True)
     acctstopdelay = models.IntegerField(null=True, blank=True)
     xascendsessionsvrkey = models.CharField(max_length=30, blank=True)
+
     class Meta:
         db_table = u'radacct'
+
 
 class Radcheck(models.Model):
     connection_name = 'radius'
@@ -126,8 +130,10 @@ class Radcheck(models.Model):
     attribute = models.CharField(max_length=192)
     op = models.CharField(max_length=6)
     value = models.CharField(max_length=759)
+
     class Meta:
         db_table = u'radcheck'
+
 
 class Radgroupcheck(models.Model):
     connection_name = 'radius'
@@ -140,6 +146,7 @@ class Radgroupcheck(models.Model):
     class Meta:
         db_table = u'radgroupcheck'
 
+
 class Radgroupreply(models.Model):
     connection_name = 'radius'
 
@@ -150,6 +157,7 @@ class Radgroupreply(models.Model):
 
     class Meta:
         db_table = u'radgroupreply'
+
 
 class Radpostauth(models.Model):
     connection_name = 'radius'
@@ -162,6 +170,7 @@ class Radpostauth(models.Model):
     class Meta:
         db_table = u'radpostauth'
 
+
 class Radreply(models.Model):
     connection_name = 'radius'
 
@@ -172,6 +181,7 @@ class Radreply(models.Model):
 
     class Meta:
         db_table = u'radreply'
+
 
 class Radusergroup(models.Model):
     connection_name = 'radius'

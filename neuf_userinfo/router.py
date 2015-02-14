@@ -1,6 +1,7 @@
 def is_radius_model(model):
     return hasattr(model, 'connection_name')
 
+
 class Router(object):
     """
     A router to point database operations on models to the right db.
@@ -28,4 +29,3 @@ class Router(object):
         if is_radius_model(model):
             return model.connection_name
         return None
-

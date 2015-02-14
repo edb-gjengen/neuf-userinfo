@@ -35,12 +35,12 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-)
-INSTALLED_APPS += (
     'django_extensions',
     'south',
-    # Our app
-    'main',
+)
+INSTALLED_APPS += (
+    'neuf_userinfo',
+    'inside',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -67,38 +67,29 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        # Example PostgreSQL config:
-        #'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        #'NAME': 'dusken_test',
-        #'USER': 'postgres',
-        #'PASSWORD': '',
-        #'HOST': '127.0.0.1',
-        #'PORT': '',
     },
     'ldap': {
         'ENGINE': 'ldapdb.backends.ldap',
         'NAME': 'ldap://localhost/',
-        'USER': 'uid=admin,ou=People,dc=neuf,dc=no',
-        'PASSWORD': '',
+        'USER': 'uid=test,ou=People,dc=neuf,dc=no',
+        'PASSWORD': 'test',
     },
     'radius': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'radius',                # Or path to database file if using sqlite3.
-        'USER': 'radius',                # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': 'localhost',             # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'radius',
+        'USER': 'radius',
+        'PASSWORD': '',
+        'HOST': 'localhost',
     },
     'inside': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'dev_inside',                # Or path to database file if using sqlite3.
-        'USER': 'dev',                # Not used with sqlite3.
-        'PASSWORD': 'dev',                  # Not used with sqlite3.
-        'HOST': 'localhost',             # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dev_inside',
+        'USER': 'dev',
+        'PASSWORD': 'dev',
+        'HOST': 'localhost',
     }
 }
-DATABASE_ROUTERS = ['main.router.Router']
+DATABASE_ROUTERS = ['neuf_userinfo.router.Router']
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -110,14 +101,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-STATIC_ROOT = 'staticfiles'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
 
 # Uploads
-# TODO S3
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
@@ -126,18 +113,19 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 SITE_ID = 1
 
-EMAIL_HOST = 'snes.neuf.no'
+EMAIL_HOST = 'mx.neuf.no'
 EMAIL_PORT = 25
 DEFAULT_FROM_EMAIL = 'noreply@neuf.no'
 
 AUTHENTICATION_BACKENDS = (
-    'main.backends.LDAPEmailBackend',
-    'main.backends.LDAPUsernameBackend',
+    # 'inside.authentication.InsideBackend',
+    'neuf_userinfo.backends.LDAPEmailBackend',
+    'neuf_userinfo.backends.LDAPUsernameBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 # No cleaningladies.
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 60 * 15 # in seconds
+SESSION_COOKIE_AGE = 60 * 15  # in seconds
 
 # LDAP server URI and BIND_DN, same as db-settings
 AUTH_LDAP_U_SERVER_URI = DATABASES['ldap']['NAME']
@@ -162,7 +150,7 @@ AUTH_LDAP_U_USER_FLAGS_BY_GROUP = {
 }
 # Group to profile flag mappings, not used.
 AUTH_LDAP_U_PROFILE_FLAGS_BY_GROUP = {
-    #"is_edb": "cn=edb,ou=Groups,dc=neuf,dc=no"
+    # "is_edb": "cn=edb,ou=Groups,dc=neuf,dc=no"
 }
 # User attribute mappings
 AUTH_LDAP_U_USER_ATTR_MAP = {
@@ -203,3 +191,11 @@ logger.setLevel(logging.DEBUG)
 KERBEROS_REALM = "NEUF.NO"
 KERBEROS_PASSWORD_CHANGING_PRINCIPAL = 'brukerinfo'
 KERBEROS_PASSWORD = ''
+
+# Inside
+INSIDE_GROUPS_SYNC_DELETE = True  # When user logs in, groups are synced (locally in Django), this deletes aswell
+
+try:
+    from local_settings import *
+except ImportError:
+    pass

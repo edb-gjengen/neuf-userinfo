@@ -1,7 +1,7 @@
 *.swp
 *.pyc
-settings.py
 db.sqlite3
 static/style/.sass-cache/
+local_settings.py
 venv
 .idea

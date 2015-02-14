@@ -1,10 +1,12 @@
 from django.contrib import admin
-from main.models import LdapGroup, LdapUser
+from neuf_userinfo.models import LdapGroup, LdapUser
+
 
 class LdapGroupAdmin(admin.ModelAdmin):
     exclude = ['dn', 'usernames']
     list_display = ['name', 'gid']
     search_fields = ['name']
+
 
 class LdapUserAdmin(admin.ModelAdmin):
     exclude = ['dn', 'password', 'photo']

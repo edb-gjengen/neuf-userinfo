@@ -12,9 +12,10 @@
 
 ## LDAP
     sudo docker run -e LDAP_DOMAIN=neuf.no -e LDAP_ORGANISATION="Neuf" -e LDAP_ROOTPASS="toor" -p 389:389 -d osixia/openldap
-    ldapadd -D "cn=admin,dc=neuf,dc=no" -w "toor" -f testdata.ldif
+    ldapadd -D "cn=admin,dc=neuf,dc=no" -w "toor" -f test/testdata.ldif
     # Verify import
     ldapsearch -x -b dc=neuf,dc=no
+    # Login with test@example.com:test
 
 # External dependencies:
  - LDAP: Read the tutorial on [Howto setup a LDAP server with Docker](https://edb.neuf.no/wiki/index.php?title=Howto_setup_a_LDAP_server_with_Docker)

@@ -1,4 +1,4 @@
-from django_auth_ldap.backend import LDAPBackend, _LDAPUser
+from django_auth_ldap.backend import LDAPBackend
 
 
 class LDAPUsernameBackend(LDAPBackend):
