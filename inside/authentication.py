@@ -19,6 +19,7 @@ class InsideBackend(object):
         inside_user = InsideUser.objects.filter(
             Q(password=password_hash) & (Q(ldap_username=username) | Q(email=username))
         )
+        # TODO log all login attempts
         # AuthLog.objects.create()
 
         if not len(inside_user) == 1:
