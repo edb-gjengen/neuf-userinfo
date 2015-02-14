@@ -117,14 +117,15 @@ def password_reset_confirm(request, uidb64=None, token=None,
         with only minor changes for LDAP-lookup.
     """
     assert uidb64 is not None and token is not None  # checked by URLconf
+
     if post_reset_redirect is None:
         post_reset_redirect = reverse('password_reset_complete')
     else:
         post_reset_redirect = resolve_url(post_reset_redirect)
     try:
         uid = urlsafe_base64_decode(uidb64)
-        user = InsideUser.objects.get(pk=uid)  # Diff line vs internal django view
-    except (TypeError, ValueError, OverflowError, InsideUser.DoesNotExist):
+        user = InsideUser.objects.get(pk=uid)  # Diff vs internal Django view
+    except (TypeError, ValueError, OverflowError, InsideUser.DoesNotExist):  # Diff vs internal Django view
         user = None
 
     if user is not None and token_generator.check_token(user, token):
@@ -145,5 +146,5 @@ def password_reset_confirm(request, uidb64=None, token=None,
     }
     if extra_context is not None:
         context.update(extra_context)
-    return TemplateResponse(request, template_name, context,
-                            current_app=current_app)
+
+    return TemplateResponse(request, template_name, context, current_app=current_app)

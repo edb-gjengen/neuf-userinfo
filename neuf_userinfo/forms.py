@@ -10,12 +10,12 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext as _
 import sys
+
 from inside.models import InsideUser
 from inside.utils import set_inside_password
-
-from models import *
-from validators import PasswordValidator
+from neuf_userinfo.models import LdapUser
 from neuf_userinfo.utils import set_kerberos_password, set_radius_password
+from neuf_userinfo.validators import PasswordValidator
 
 
 class NeufSetPasswordForm(SetPasswordForm):
@@ -68,7 +68,7 @@ class NeufPasswordResetForm(PasswordResetForm):
         Generates a one-use only link for resetting password and sends to the user.
 
         Note: this is the same form as django.contrib.auth.forms.PasswordResetForm
-            with some changes for LDAP-lookup.
+            with some changes for looking up a custom user object.
         """
         from django.core.mail import send_mail
         for user in self.users_cache:

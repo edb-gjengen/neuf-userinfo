@@ -22,7 +22,7 @@ class InsideBackend(object):
         # TODO log all login attempts
         # AuthLog.objects.create()
 
-        if not len(inside_user) == 1:
+        if len(inside_user) != 1:
             return None
 
         inside_user = inside_user[0]

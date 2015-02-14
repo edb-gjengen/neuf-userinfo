@@ -6,8 +6,6 @@
     pip install -r requirements.txt
     cp userinfosite/settings-sample.py userinfosite/settings.py
     python manage.py syncdb
-    # create the radius database tables, if they don't exist already
-    python manage.py syncdb --database=radius
     python manage.py runserver
 
 ## LDAP
@@ -17,13 +15,26 @@
     ldapsearch -x -b dc=neuf,dc=no
     # Login with test@example.com:test
 
+## Inside
+    # create the Inside database tables, if they don't exist already
+    python manage.py syncdb --database=inside
+
+For simple dev you need at least:
+    * 1 InsideUser (din_user)
+    * 1 InsideGroup (din_group)
+    * 1 UserGroupRelationShip (din_usergrouprelationship)
+
+## RADIUS
+    # create the radius database tables, if they don't exist already
+    python manage.py syncdb --database=radius
+
+
 # External dependencies:
  - LDAP: Read the tutorial on [Howto setup a LDAP server with Docker](https://edb.neuf.no/wiki/index.php?title=Howto_setup_a_LDAP_server_with_Docker)
  - Kerberos: TODO
  - RADIUS: TODO
- - Inside: Going away
+ - Inside: Never going away! See https://git.neuf.no/edb/inside#tab-readme for code and installation
 
 
 # TODO
- - finish auth backend.
  - allow non LDAP-users (conditional LDAP-stuff), because we don't want LDAP filled with non-active members
