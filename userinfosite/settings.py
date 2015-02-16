@@ -36,10 +36,12 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'south',
 )
 INSTALLED_APPS += (
     'neuf_userinfo',
+    'neuf_ldap',
+    'neuf_radius',
+    'neuf_kerberos',
     'inside',
 )
 
@@ -194,6 +196,8 @@ KERBEROS_PASSWORD = ''
 
 # Inside
 INSIDE_GROUPS_SYNC_DELETE = True  # When user logs in, groups are synced (locally in Django), this deletes aswell
+INSIDE_USERSYNC_API_KEY = ''
+INSIDE_USERSYNC_ENC_KEY = ''
 
 try:
     from local_settings import *

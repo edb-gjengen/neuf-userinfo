@@ -1,21 +1,22 @@
 # coding: utf-8
+from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import SetPasswordForm, AuthenticationForm
 from django.contrib.auth import login, logout as auth_logout
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render_to_response, resolve_url, render
 from django.template import RequestContext
 from django.template.response import TemplateResponse
 from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
-import json
-from inside.models import InsideUser
+from django.views.generic import View
 
-from models import *
-import utils
+from inside.models import InsideUser
+from neuf_ldap.models import LdapGroup, LdapUser
+from neuf_userinfo.utils import decrypt_rijndael
 
 
 def index(request):
@@ -35,6 +36,7 @@ def index(request):
 
 @login_required
 def profile(request):
+    # FIXME: Allmost identical to below
     username = request.user.username
     groups = request.user.groups.all()
     ldap_user = None
@@ -61,38 +63,6 @@ def user_profile(request, username):
     private_group = LdapGroup.objects.get(gid=ldap_user.group)
 
     return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
-
-
-# TODO security
-def client_status(request):
-    krb5_principal = utils.get_kerberos_principal(request.GET.get('username'))
-    if krb5_principal:
-        last_succ_auth = utils.format_krb5_date(krb5_principal['Last successful authentication'])
-        status = {
-            'active': True,
-            'last_successful_auth': last_succ_auth,
-            'last_modified': krb5_principal['Last modified']
-        }
-    else:
-        status = {'active': False}
-    return HttpResponse(json.dumps(status), content_type='application/javascript; charset=utf8')
-
-
-# TODO security
-def wireless_status(request):
-    username = request.GET.get('username')
-    try:
-        radius_user = Radcheck.objects.get(username=username)
-    except Radcheck.ObjectDoesNotExist:
-        return HttpResponse(json.dumps({'active': False}), content_type='application/javascript; charset=utf8')
-
-    # get last authentication
-    last_auth = Radpostauth.objects.filter(username__iexact=username, reply='Access-Accept').order_by('authdate')
-    status = {'active': True, 'hash': radius_user.attribute}
-    if len(last_auth) != 0:
-        status['last_successful_auth'] = last_auth[0].authdate.strftime('%Y-%m-%d %H:%M:%S')
-
-    return HttpResponse(json.dumps(status), content_type='application/javascript; charset=utf8')
 
 
 def logout(request):
@@ -148,3 +118,49 @@ def password_reset_confirm(request, uidb64=None, token=None,
         context.update(extra_context)
 
     return TemplateResponse(request, template_name, context, current_app=current_app)
+
+
+class AddNewUserView(View):
+    ATTRS = ['username', 'firstname', 'lastname', 'email', 'password', 'groups']
+
+    def get(self, request):
+        """
+            - Create new user in LDAP (username, first_name, last_name, email)
+            - add to groups (usergroup, dns-alle), it not exists, create
+            - Set LDAP password
+            - Create automount entry
+            - Create kerberos principal and set password
+            - Create homedir on wii
+            - Set RADIUS password
+        """
+        if not self._validate_api_key(request.GET.get('api_key', '')):
+            return HttpResponse('Invalid api_key')
+        if not self._validate_attributes(request):
+            return HttpResponse('Missing at least one required attribute: '.format(', '.join(self.ATTRS)))
+
+        user_data = self._get_user(request.GET)
+
+        # TODO: you are here
+
+        result = {'yousir': 'are a scholar!'}
+        return JsonResponse(result)
+
+    def _validate_api_key(self, api_key):
+        if api_key == '' or api_key != settings.INSIDE_USERSYNC_API_KEY:
+            return False
+
+        return True
+
+    def _validate_attributes(self, request):
+        for a in self.ATTRS:
+            if a not in request.GET:
+                return False
+
+        return True
+
+    def _get_user(self, params):
+        user = {a: params[a] for a in self.ATTRS}
+        user['password'] = decrypt_rijndael(settings.INSIDE_USERSYNC_ENC_KEY, user['password'])
+        user['groups'] = user['groups'].strip().split(',')
+
+        return user

@@ -1,6 +1,6 @@
 # coding: utf-8
 from __future__ import unicode_literals
-from django.contrib.auth.forms import SetPasswordForm, PasswordResetForm
+from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
 from django.core.validators import MinLengthValidator
@@ -9,32 +9,40 @@ from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext as _
-import sys
 
 from inside.models import InsideUser
 from inside.utils import set_inside_password
-from neuf_userinfo.models import LdapUser
-from neuf_userinfo.utils import set_kerberos_password, set_radius_password
+
+from neuf_kerberos.utils import set_kerberos_password
+from neuf_radius.utils import set_radius_password
+from neuf_ldap.utils import set_ldap_password
 from neuf_userinfo.validators import PasswordValidator
 
 
 class NeufSetPasswordForm(SetPasswordForm):
+    """
+        Saves a user password in each of the following services:
+        - Inside (all)
+        - Kerberos
+        - LDAP
+        - RADIUS
+
+        Note: self.user is a local Django User object (which does not have a usable password)
+    """
     def save(self, commit=True):
 
+        username = self.user.username
+        password = self.cleaned_data['new_password1']
+
         # Membership database
-        set_inside_password(self.user.username, self.cleaned_data['new_password1'])
+        set_inside_password(username, password)
 
         # Active services
-        set_kerberos_password(self.user.username, self.cleaned_data['new_password1'])
-        set_radius_password(self.user.username, self.cleaned_data['new_password1'])
+        set_kerberos_password(username, password)
+        set_radius_password(username, password)
+        set_ldap_password(username, password)
 
-        # LDAP: Lookup the Ldap user with the identical username (1-to-1).
-        self.user = LdapUser.objects.get(username=self.user.username)
-        self.user.set_password(self.cleaned_data['new_password1'])
-        if commit:
-            self.user.save()
-
-        return self.user
+        return self.user  # Local Django User
 
     def clean_new_password1(self):
         raw_password = self.cleaned_data.get('new_password1')
@@ -49,12 +57,13 @@ class NeufPasswordChangeForm(NeufSetPasswordForm):
     pass
 
 
-class NeufPasswordResetForm(PasswordResetForm):
+class NeufPasswordResetForm(forms.Form):
     EMAIL_ERROR_MSG = "That e-mail address doesn't have an associated user account. Are you sure you've registered?"
+    email = forms.EmailField(label=_("Email"), max_length=254)
 
     def clean_email(self):
         email = self.cleaned_data["email"].lower()
-        self.users_cache = InsideUser.objects.filter(email=email)
+        self.users_cache = InsideUser.objects.filter(email=email)  # From Membership database (Inside)
         if len(self.users_cache) == 0:
             raise forms.ValidationError(_(self.EMAIL_ERROR_MSG))
         return email
@@ -63,15 +72,24 @@ class NeufPasswordResetForm(PasswordResetForm):
              subject_template_name='registration/password_reset_subject.txt',
              email_template_name='registration/password_reset_email.html',
              use_https=False, token_generator=default_token_generator,
-             from_email=None, request=None):
+             from_email=None, request=None, html_email_template_name=None):
         """
-        Generates a one-use only link for resetting password and sends to the user.
+        Generates a one-use only link for resetting password and sends to the
+        user.
 
         Note: this is the same form as django.contrib.auth.forms.PasswordResetForm
             with some changes for looking up a custom user object.
         """
         from django.core.mail import send_mail
+        # UserModel = get_user_model()
+        # email = self.cleaned_data["email"]
+        # active_users = UserModel._default_manager.filter(
+        #     email__iexact=email, is_active=True)
         for user in self.users_cache:
+            # Make sure that no email is sent to a user that actually has
+            # a password marked as unusable
+            # if not user.has_usable_password():
+            #     continue
             if not domain_override:
                 current_site = get_current_site(request)
                 site_name = current_site.name
@@ -91,8 +109,9 @@ class NeufPasswordResetForm(PasswordResetForm):
             # Email subject *must not* contain newlines
             subject = ''.join(subject.splitlines())
             email = loader.render_to_string(email_template_name, c)
-            if sys.version_info < (2, 6, 6):
-                # Workaround for http://bugs.python.org/issue1368247
-                email = email.encode('utf-8')
 
-            send_mail(subject, email, from_email, [user.email])
+            if html_email_template_name:
+                html_email = loader.render_to_string(html_email_template_name, c)
+            else:
+                html_email = None
+            send_mail(subject, email, from_email, [user.email], html_message=html_email)

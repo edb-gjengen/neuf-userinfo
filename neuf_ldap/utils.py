@@ -2,14 +2,17 @@ import hashlib
 import os
 from base64 import encodestring as encode
 from base64 import decodestring as decode
+import os.path
 
-# Ref:
-#  - http://www.openldap.org/faq/data/cache/347.html
-#  - http://www.openldap.org/doc/admin24/security.html
+"""
+    Ref:
+     - http://www.openldap.org/faq/data/cache/347.html
+     - http://www.openldap.org/doc/admin24/security.html
+"""
 
 
 def ldap_create(raw_password, hash_type='ssha'):
-    # Generate a salted SHA hash
+    # Generate a salted SHA1 hash
     salt = os.urandom(4)
     h = hashlib.sha1(raw_password)
     h.update(salt)
@@ -27,7 +30,11 @@ def ldap_validate(raw_password, challenge_password):
     return digest == hr.digest()
 
 
-def radius_create(raw_password):
-    # found in the wild.
-    nt_password = hashlib.new('md4', raw_password.encode('utf-16le')).hexdigest()
-    return nt_password
+def set_ldap_password(username, raw_password):
+    from neuf_ldap.models import LdapUser
+    try:
+        # LDAP: Lookup the Ldap user with the identical username (1-to-1).
+        user = LdapUser.objects.get(username=username)
+        user.set_password(raw_password)
+    except LdapUser.DoesNotExist:
+        pass

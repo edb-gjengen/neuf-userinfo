@@ -1,6 +1,8 @@
 from django.conf.urls import include, patterns, url
 from django.contrib import admin
 from neuf_userinfo.forms import NeufPasswordChangeForm, NeufSetPasswordForm, NeufPasswordResetForm
+from neuf_userinfo.views import AddNewUserView
+
 admin.autodiscover()
 
 import settings
@@ -10,8 +12,8 @@ urlpatterns = patterns(
     url(r'^admin/', include(admin.site.urls)),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    url(r'^userstatus/client/$', 'neuf_userinfo.views.client_status'),
-    url(r'^userstatus/wireless/$', 'neuf_userinfo.views.wireless_status'),
+    url(r'^userstatus/client/$', 'neuf_kerberos.views.client_status'),
+    url(r'^userstatus/wireless/$', 'neuf_radius.views.wireless_status'),
     url(r'^$', 'neuf_userinfo.views.index'),
 )
 
@@ -30,11 +32,20 @@ urlpatterns += patterns(
 
     # Reset password (forgot password)
     url(r'^accounts/password/reset$', 'django.contrib.auth.views.password_reset',
-        {'password_reset_form': NeufPasswordResetForm, 'from_email': settings.DEFAULT_FROM_EMAIL}),
+        {'password_reset_form': NeufPasswordResetForm,
+         'from_email': settings.DEFAULT_FROM_EMAIL,
+         'email_template_name': 'registration/password_reset_email.txt',
+         'html_email_template_name': 'registration/password_reset_email.html'}),
     url(r'^accounts/password/reset/done$', 'django.contrib.auth.views.password_reset_done', name='password_reset_done'),
     # Set password
     url(r'^accounts/password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         'neuf_userinfo.views.password_reset_confirm',
         {'set_password_form': NeufSetPasswordForm}),
     url(r'^accounts/password/reset/complete$', 'django.contrib.auth.views.password_reset_complete', name='password_reset_complete'),
+)
+
+# Rewrite of usersync.neuf.no
+urlpatterns += patterns(
+    '',
+    url(r'^usersync/$', AddNewUserView.as_view(), name='usersync'),
 )
