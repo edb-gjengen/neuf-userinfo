@@ -6,7 +6,11 @@ from neuf_ldap.utils import ldap_create, ldap_validate
 
 
 class LdapUser(ldapdb.models.Model):
-    """ Represents an LDAP posixAccount,inetOrgPerson entry. """
+    """
+        Represents an LDAP posixAccount,inetOrgPerson entry.
+        Ref:
+         - http://www.zytrax.com/books/ldap/apa/types.html
+    """
 
     connection_name = 'ldap'
 
@@ -30,9 +34,19 @@ class LdapUser(ldapdb.models.Model):
     home_directory = CharField(db_column='homeDirectory')
     login_shell = CharField(db_column='loginShell', default='/bin/bash')
     username = CharField(db_column='uid', primary_key=True)
-    password = CharField(db_column='userPassword')
 
-    # TODO shadowAccount
+    # shadowAccount
+    password = CharField(db_column='userPassword')
+    shadowLastChange = CharField(db_column='shadowLastChange', default='10877')  # Magic number?
+    shadowMin = CharField(db_column='shadowMin', default='8')
+    shadowMax = CharField(db_column='shadowMax', default='999999')
+    shadowWarning = CharField(db_column='shadowWarning', default='7')
+    shadowInactive = CharField(db_column='shadowInactive')
+    shadowExpire = CharField(db_column='shadowExpire', default='-1')
+    shadowFlag = CharField(db_column='shadowFlag', default='0')
+
+    # core
+    description = CharField(db_column='description')
 
     # ugly hack to use django internals for password reset
     last_login = datetime.datetime(2001, 1, 1)
@@ -68,3 +82,5 @@ class LdapGroup(ldapdb.models.Model):
 
     def __unicode__(self):
         return self.name
+
+# TODO Automount: http://www.openldap.org/faq/data/cache/599.html

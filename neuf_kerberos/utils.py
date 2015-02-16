@@ -26,6 +26,7 @@ def get_kerberos_principal(username):
     match = re.findall(r'([\w ]*): (.+)', output)
     for key, value in match:
         cleaned_output[key] = value
+
     return cleaned_output
 
 
