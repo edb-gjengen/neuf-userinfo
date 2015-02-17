@@ -1,9 +1,10 @@
 import hashlib
+
 from neuf_radius.models import Radcheck
 
 
 def radius_create(raw_password):
-    # found in the wild.
+    # Found in the wild.
     nt_password = hashlib.new('md4', raw_password.encode('utf-16le')).hexdigest()
     return nt_password
 
@@ -26,3 +27,6 @@ def set_radius_password(username, raw_password):
     radius_user.value = radius_create(raw_password)
     radius_user.save()
 
+
+def create_user(username, password):
+    set_radius_password(username, password)

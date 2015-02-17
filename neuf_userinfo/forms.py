@@ -1,8 +1,10 @@
 # coding: utf-8
 from __future__ import unicode_literals
+from django.conf import settings
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import get_current_site
+from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django import forms
 from django.template import loader
@@ -16,7 +18,8 @@ from inside.utils import set_inside_password
 from neuf_kerberos.utils import set_kerberos_password
 from neuf_radius.utils import set_radius_password
 from neuf_ldap.utils import set_ldap_password
-from neuf_userinfo.validators import PasswordValidator
+from neuf_userinfo.utils import decrypt_rijndael
+from neuf_userinfo.validators import PasswordValidator, UsernameValidator
 
 
 class NeufSetPasswordForm(SetPasswordForm):
@@ -115,3 +118,29 @@ class NeufPasswordResetForm(forms.Form):
             else:
                 html_email = None
             send_mail(subject, email, from_email, [user.email], html_message=html_email)
+
+
+class NewUserForm(forms.Form):
+    username = forms.CharField(min_length=3, required=True)
+    firstname = forms.CharField(required=True)
+    lastname = forms.CharField(required=True)
+    email = forms.EmailField(required=True)
+    password = forms.CharField(min_length=8, required=True)
+    groups = forms.CharField(required=True)
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        UsernameValidator(username)
+
+        return username
+
+    def clean_password(self):
+        raw_password = self.cleaned_data['password']
+        password = decrypt_rijndael(settings.INSIDE_USERSYNC_ENC_KEY, raw_password)
+        PasswordValidator(password)
+
+        return password
+
+    def clean_groups(self):
+        groups = self.cleaned_data['groups']
+        return groups.strip().split(',')

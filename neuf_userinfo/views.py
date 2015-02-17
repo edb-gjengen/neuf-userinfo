@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import SetPasswordForm, AuthenticationForm
 from django.contrib.auth import login, logout as auth_logout
 from django.contrib.auth.tokens import default_token_generator
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render_to_response, resolve_url, render
@@ -16,6 +17,7 @@ from django.views.generic import View
 
 from inside.models import InsideUser
 from neuf_ldap.models import LdapGroup, LdapUser
+from neuf_userinfo.forms import NewUserForm
 from neuf_userinfo.utils import decrypt_rijndael
 
 
@@ -121,7 +123,6 @@ def password_reset_confirm(request, uidb64=None, token=None,
 
 
 class AddNewUserView(View):
-    ATTRS = ['username', 'firstname', 'lastname', 'email', 'password', 'groups']
 
     def get(self, request):
         """
@@ -133,34 +134,23 @@ class AddNewUserView(View):
             - Create homedir on wii
             - Set RADIUS password
         """
-        if not self._validate_api_key(request.GET.get('api_key', '')):
-            return HttpResponse('Invalid api_key')
-        if not self._validate_attributes(request):
-            return HttpResponse('Missing at least one required attribute: '.format(', '.join(self.ATTRS)))
 
-        user_data = self._get_user(request.GET)
+        if not self.validate_api_key(request.GET.get('api_key', '')):
+            return JsonResponse({'errors': 'Invalid api_key'})
 
-        # TODO: you are here
+        form = NewUserForm(request.GET)
+        if not form.is_valid():
+            return JsonResponse({'errors': form.errors})
+
+        user = form.cleaned_data
+        # print "yey", user
+        # TODO you are still here
 
         result = {'yousir': 'are a scholar!'}
         return JsonResponse(result)
 
-    def _validate_api_key(self, api_key):
+    def validate_api_key(self, api_key):
         if api_key == '' or api_key != settings.INSIDE_USERSYNC_API_KEY:
             return False
 
         return True
-
-    def _validate_attributes(self, request):
-        for a in self.ATTRS:
-            if a not in request.GET:
-                return False
-
-        return True
-
-    def _get_user(self, params):
-        user = {a: params[a] for a in self.ATTRS}
-        user['password'] = decrypt_rijndael(settings.INSIDE_USERSYNC_ENC_KEY, user['password'])
-        user['groups'] = user['groups'].strip().split(',')
-
-        return user

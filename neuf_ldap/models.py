@@ -41,7 +41,7 @@ class LdapUser(ldapdb.models.Model):
     shadowMin = CharField(db_column='shadowMin', default='8')
     shadowMax = CharField(db_column='shadowMax', default='999999')
     shadowWarning = CharField(db_column='shadowWarning', default='7')
-    shadowInactive = CharField(db_column='shadowInactive')
+    shadowInactive = CharField(db_column='shadowInactive')  # FIXME what should this be?
     shadowExpire = CharField(db_column='shadowExpire', default='-1')
     shadowFlag = CharField(db_column='shadowFlag', default='0')
 
