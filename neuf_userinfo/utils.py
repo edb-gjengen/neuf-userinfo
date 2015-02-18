@@ -49,3 +49,8 @@ def decrypt_rijndael(key, encoded):
 
     plaintext = padded_text.split('\x00', 1)[0]
     return plaintext
+
+
+def create_homedir(username):
+    # TODO
+    pass

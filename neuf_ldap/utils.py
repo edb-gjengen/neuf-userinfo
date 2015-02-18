@@ -58,6 +58,12 @@ def set_ldap_password(username, raw_password):
         pass
 
 
-def create_ldap_user(user):
+def ldap_create_user(user):
     from neuf_ldap.models import LdapUser
     u = LdapUser()
+    # TODO
+
+
+def ldap_create_automount(user):
+    # TODO
+    pass

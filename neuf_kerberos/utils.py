@@ -53,3 +53,8 @@ def format_krb5_date(date):
     except ValueError:
         formatted_date = 'never'
     return formatted_date
+
+
+def kerberos_create_principal(user):
+    # TODO
+    pass

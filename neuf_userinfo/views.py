@@ -16,8 +16,12 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import View
 
 from inside.models import InsideUser
+from neuf_kerberos.utils import kerberos_create_principal
 from neuf_ldap.models import LdapGroup, LdapUser
+from neuf_ldap.utils import ldap_create_user, ldap_create_automount
+from neuf_radius.utils import radius_create_user
 from neuf_userinfo.forms import NewUserForm
+from neuf_userinfo.utils import create_homedir
 
 
 def index(request):
@@ -66,7 +70,6 @@ def profile(request, username=None):
         'ldap_private_group': ldap_private_group,
         'user': user
     }
-    print response
     return render(request, 'private/profile.html', response)
 
 
@@ -146,6 +149,12 @@ class AddNewUserView(View):
             return JsonResponse({'errors': form.errors})
 
         user = form.cleaned_data
+
+        ldap_create_user(user)
+        ldap_create_automount(user)
+        kerberos_create_principal(user)
+        create_homedir(user.username)  # FIXME run ssh script?
+        radius_create_user(user.username, user.password)
         # print "yey", user
         # TODO you are still here
 

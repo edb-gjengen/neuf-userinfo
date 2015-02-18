@@ -28,5 +28,5 @@ def set_radius_password(username, raw_password):
     radius_user.save()
 
 
-def create_user(username, password):
+def radius_create_user(username, password):
     set_radius_password(username, password)
