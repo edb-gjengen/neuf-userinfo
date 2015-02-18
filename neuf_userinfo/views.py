@@ -1,14 +1,14 @@
 # coding: utf-8
 from django.conf import settings
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import SetPasswordForm, AuthenticationForm
 from django.contrib.auth import login, logout as auth_logout
+from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render_to_response, resolve_url, render
-from django.template import RequestContext
+from django.http import HttpResponseRedirect, JsonResponse
+from django.http.response import HttpResponseNotFound
+from django.shortcuts import resolve_url, render, get_object_or_404
 from django.template.response import TemplateResponse
 from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.cache import never_cache
@@ -18,7 +18,6 @@ from django.views.generic import View
 from inside.models import InsideUser
 from neuf_ldap.models import LdapGroup, LdapUser
 from neuf_userinfo.forms import NewUserForm
-from neuf_userinfo.utils import decrypt_rijndael
 
 
 def index(request):
@@ -33,38 +32,42 @@ def index(request):
         else:
             form = AuthenticationForm(request)
 
-    return render_to_response('public/index.html', locals(), context_instance=RequestContext(request))
+    return render(request, 'public/index.html', {'form': form})
 
 
 @login_required
-def profile(request):
-    # FIXME: Allmost identical to below
-    username = request.user.username
-    groups = request.user.groups.all()
+def profile(request, username=None):
+    if not username:
+        user = request.user
+        username = request.user.username
+    else:
+        # Only allow superusers
+        if not request.user.is_superuser:
+            return HttpResponseNotFound()
+
+        user = get_object_or_404(User, username=username)
+
+    # TODO: Move LDAP stuff to JSON-view and load via AJAX (more fault tolerant)
     ldap_user = None
+    ldap_groups = None
+    ldap_private_group = None
     try:
         ldap_user = LdapUser.objects.get(username=username)
     except LdapUser.DoesNotExist:
-        return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
+        pass
 
-    ldap_groups = LdapGroup.objects.filter(usernames__contains=username)
-    ldap_private_group = LdapGroup.objects.get(gid=ldap_user.group)
+    if ldap_user:
+        ldap_groups = LdapGroup.objects.filter(usernames__contains=username)
+        ldap_private_group = LdapGroup.objects.get(gid=ldap_user.group)
 
-    return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
-
-
-@permission_required('main.is_superuser')
-def user_profile(request, username):
-    ldap_user = None
-    try:
-        ldap_user = LdapUser.objects.get(username=username)
-    except LdapUser.DoesNotExist:
-        return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
-
-    groups = LdapGroup.objects.filter(usernames__contains=username)
-    private_group = LdapGroup.objects.get(gid=ldap_user.group)
-
-    return render_to_response('private/profile.html', locals(), context_instance=RequestContext(request))
+    response = {
+        'ldap_user': ldap_user,
+        'ldap_groups': ldap_groups,
+        'ldap_private_group': ldap_private_group,
+        'user': user
+    }
+    print response
+    return render(request, 'private/profile.html', response)
 
 
 def logout(request):
@@ -127,7 +130,7 @@ class AddNewUserView(View):
     def get(self, request):
         """
             - Create new user in LDAP (username, first_name, last_name, email)
-            - add to groups (usergroup, dns-alle), it not exists, create
+            - Add to groups (usergroup, dns-alle), it not exists, create
             - Set LDAP password
             - Create automount entry
             - Create kerberos principal and set password

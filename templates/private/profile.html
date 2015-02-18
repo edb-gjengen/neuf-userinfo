@@ -27,14 +27,14 @@
         <h2>Dine grupper</h2>
         <div class="well">
             <ul>
-            {% if groups %}
+            {% if ldap_groups %}
                 {% if ldap_private_group %}<li>{{ ldap_private_group }}</li>{% endif %}
-                {% for group in groups %}
-                {% if group = "dns-aktiv" %}
-                    <li title="Du har tilgang til foreningsmaskinene.">{{ group }}</li>
-                {% else %}
-                    <li>{{ group }}</li>
-                {% endif %}
+                {% for group in ldap_groups %}
+                    {% if group = "dns-aktiv" %}
+                        <li title="Du har tilgang til foreningsmaskinene.">{{ group }}</li>
+                    {% else %}
+                        <li>{{ group }}</li>
+                    {% endif %}
                 {% endfor %}
             {% else %}
                 <li>Ingen grupper.</li>
