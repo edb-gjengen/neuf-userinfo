@@ -150,16 +150,17 @@ class AddNewUserView(View):
 
         user = form.cleaned_data
 
-        ldap_create_user(user)
-        ldap_create_automount(user)
-        kerberos_create_principal(user)
-        create_homedir(user.username)  # FIXME run ssh script?
-        radius_create_user(user.username, user.password)
-        # print "yey", user
-        # TODO you are still here
+        results = {
+            'user': user,
+            'ldap_user': ldap_create_user(user),
+            'ldap_automount': ldap_create_automount(user),
+            'kerberos_principal': kerberos_create_principal(user),
+            'homedir': create_homedir(user['username']),  # FIXME run ssh script?
+            'radius': radius_create_user(user['username'], user['password'])
+        }
+        # import pprint; pprint.pprint(results)
 
-        result = {'yousir': 'are a scholar!'}
-        return JsonResponse(result)
+        return JsonResponse({'results': 'success'})
 
     def validate_api_key(self, api_key):
         if api_key == '' or api_key != settings.INSIDE_USERSYNC_API_KEY:

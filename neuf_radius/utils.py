@@ -1,12 +1,10 @@
-import hashlib
+from passlib.hash import nthash
 
 from neuf_radius.models import Radcheck
 
 
 def radius_create(raw_password):
-    # Found in the wild.
-    nt_password = hashlib.new('md4', raw_password.encode('utf-16le')).hexdigest()
-    return nt_password
+    return nthash.encrypt(raw_password)
 
 
 def set_radius_password(username, raw_password):

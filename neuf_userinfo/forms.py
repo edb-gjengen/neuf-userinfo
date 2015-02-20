@@ -16,8 +16,9 @@ from inside.models import InsideUser
 from inside.utils import set_inside_password
 
 from neuf_kerberos.utils import set_kerberos_password
+from neuf_ldap.models import LdapGroup, LdapUser
 from neuf_radius.utils import set_radius_password
-from neuf_ldap.utils import set_ldap_password
+from neuf_ldap.utils import set_ldap_password, ldap_username_exists, ldap_user_group_exists
 from neuf_userinfo.utils import decrypt_rijndael
 from neuf_userinfo.validators import PasswordValidator, UsernameValidator
 
@@ -131,6 +132,12 @@ class NewUserForm(forms.Form):
     def clean_username(self):
         username = self.cleaned_data['username']
         UsernameValidator(username)
+
+        if ldap_username_exists(username):
+            raise ValidationError("User '{}' already exists in LDAP".format(username))
+
+        if ldap_user_group_exists(username):
+            raise ValidationError("User '{}' already has a user group in LDAP".format(username))
 
         return username
 

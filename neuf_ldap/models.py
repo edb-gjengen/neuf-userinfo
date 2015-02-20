@@ -1,4 +1,5 @@
 import datetime
+from django.conf import settings
 import ldapdb.models
 from ldapdb.models.fields import CharField, ImageField, IntegerField, ListField
 
@@ -7,15 +8,14 @@ from neuf_ldap.utils import ldap_create, ldap_validate
 
 class LdapUser(ldapdb.models.Model):
     """
-        Represents an LDAP posixAccount,inetOrgPerson entry.
-        Ref:
-         - http://www.zytrax.com/books/ldap/apa/types.html
+        Represents an LDAP posixAccount, inetOrgPerson, shadowAccount entry.
+        Ref: http://www.zytrax.com/books/ldap/apa/types.html
     """
 
     connection_name = 'ldap'
 
     # LDAP meta-data
-    base_dn = "ou=People,dc=neuf,dc=no"  # FXIME: CONFIG
+    base_dn = settings.LDAP_USER_DN
     object_classes = ['inetOrgPerson', 'posixAccount', 'shadowAccount']
 
     # inetOrgPerson
@@ -31,33 +31,41 @@ class LdapUser(ldapdb.models.Model):
     id = IntegerField(db_column='uidNumber', unique=True)  # referenced in reset password form
     group = IntegerField(db_column='gidNumber')
     gecos = CharField(db_column='gecos')
+    display_name = CharField(db_column='displayname')
     home_directory = CharField(db_column='homeDirectory')
-    login_shell = CharField(db_column='loginShell', default='/bin/bash')
+    login_shell = CharField(db_column='loginShell', default=settings.LDAP_LOGIN_SHELL)
     username = CharField(db_column='uid', primary_key=True)
 
     # shadowAccount
     password = CharField(db_column='userPassword')
-    shadowLastChange = CharField(db_column='shadowLastChange', default='10877')  # Magic number?
-    shadowMin = CharField(db_column='shadowMin', default='8')
-    shadowMax = CharField(db_column='shadowMax', default='999999')
-    shadowWarning = CharField(db_column='shadowWarning', default='7')
-    shadowInactive = CharField(db_column='shadowInactive')  # FIXME what should this be?
-    shadowExpire = CharField(db_column='shadowExpire', default='-1')
-    shadowFlag = CharField(db_column='shadowFlag', default='0')
+    shadowLastChange = IntegerField(db_column='shadowLastChange', default=settings.LDAP_SHADOW_LAST_CHANGE)
+    shadowMin = IntegerField(db_column='shadowMin', default=settings.LDAP_SHADOW_MIN)
+    shadowMax = IntegerField(db_column='shadowMax', default=settings.LDAP_SHADOW_MAX)
+    shadowWarning = IntegerField(db_column='shadowWarning', default=settings.LDAP_SHADOW_WARNING)
+    shadowInactive = IntegerField(db_column='shadowInactive')
+    shadowExpire = IntegerField(db_column='shadowExpire', default=settings.LDAP_SHADOW_EXPIRE)
+    shadowFlag = IntegerField(db_column='shadowFlag', default=settings.LDAP_SHADOW_FLAG)
 
     # core
     description = CharField(db_column='description')
 
-    # ugly hack to use django internals for password reset
+    # Hack to use django internals for password reset
     last_login = datetime.datetime(2001, 1, 1)
 
-    def set_password(self, raw_password):
-        if raw_password is None:
-            self.password = "!"
-            return
+    def _days_since_1970(self):
+        epoch = datetime.datetime.utcfromtimestamp(0)
+        today = datetime.datetime.today()
+        delta = today - epoch
 
+        return delta.days
+
+    def set_password(self, raw_password, commit=True):
         self.password = ldap_create(raw_password)
-        self.save()
+        # Update last changed password date
+        self.shadowLastChange = self._days_since_1970()
+
+        if commit:
+            self.save()
 
     def check_password(self, raw_password):
         return ldap_validate(raw_password, self.password)
@@ -72,13 +80,13 @@ class LdapGroup(ldapdb.models.Model):
     connection_name = 'ldap'
 
     # LDAP meta-data
-    base_dn = "ou=Groups,dc=neuf,dc=no"  # CONFIG
+    base_dn = settings.LDAP_GROUP_DN
     object_classes = ['posixGroup']
 
     # posixGroup attributes
     gid = IntegerField(db_column='gidNumber', unique=True)
     name = CharField(db_column='cn', max_length=200, primary_key=True)
-    usernames = ListField(db_column='memberUid')
+    members = ListField(db_column='memberUid')
 
     def __unicode__(self):
         return self.name
