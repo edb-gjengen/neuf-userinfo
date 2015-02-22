@@ -14,6 +14,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import View
+import logging
 
 from inside.models import InsideUser
 from neuf_kerberos.utils import kerberos_create_principal
@@ -22,6 +23,8 @@ from neuf_ldap.utils import ldap_create_user, ldap_create_automount
 from neuf_radius.utils import radius_create_user
 from neuf_userinfo.forms import NewUserForm
 from neuf_userinfo.ssh import create_home_dir
+
+logger = logging.getLogger(__name__)
 
 
 def index(request):
@@ -155,10 +158,10 @@ class AddNewUserView(View):
             'ldap_user': ldap_create_user(user),
             'homedir': create_home_dir(user['username']),
             'ldap_automount': ldap_create_automount(user['username']),
-            'kerberos_principal': kerberos_create_principal(user),
+            'kerberos_principal': kerberos_create_principal(user['username'], user['password']),
             'radius': radius_create_user(user['username'], user['password'])
         }
-        import pprint; pprint.pprint(results)
+        logger.debug(results)
 
         return JsonResponse({'results': 'success'})
 

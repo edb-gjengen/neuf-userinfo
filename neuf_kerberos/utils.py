@@ -55,13 +55,13 @@ def format_krb5_date(date):
     return formatted_date
 
 
-def kerberos_create_principal(user):
-    principal = "{}@{}".format(user['username'], settings.KERBEROS_REALM)
+def kerberos_create_principal(username, password):
+    principal = "{}@{}".format(username, settings.KERBEROS_REALM)
     kadmin_query = " -p '{}' -w {} -q 'add_principal {} -pw {}'".format(
         settings.KERBEROS_PASSWORD_CHANGING_PRINCIPAL,
         settings.KERBEROS_PASSWORD,
         principal,
-        user['password'])
+        password)
     p = Popen('kadmin' + kadmin_query, shell=True, stdout=PIPE, stderr=PIPE)
     output, error = p.communicate()
     if error:
