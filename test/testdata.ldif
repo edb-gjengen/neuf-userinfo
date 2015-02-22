@@ -61,3 +61,15 @@ cn: edbadmin
 gidNumber: 3
 description: Group account
 memberUid: test
+
+# Root dn for all automounts
+dn: ou=Automount,dc=neuf,dc=no
+objectClass: top
+objectClass: organizationalUnit
+ou: Automount
+
+# Automount map for auto.home
+dn: ou=auto.home,ou=Automount,dc=neuf,dc=no
+objectClass: top
+objectClass: automountMap
+ou: auto.home

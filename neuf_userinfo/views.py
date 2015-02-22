@@ -21,7 +21,7 @@ from neuf_ldap.models import LdapGroup, LdapUser
 from neuf_ldap.utils import ldap_create_user, ldap_create_automount
 from neuf_radius.utils import radius_create_user
 from neuf_userinfo.forms import NewUserForm
-from neuf_userinfo.utils import create_homedir
+from neuf_userinfo.ssh import create_home_dir
 
 
 def index(request):
@@ -153,12 +153,12 @@ class AddNewUserView(View):
         results = {
             'user': user,
             'ldap_user': ldap_create_user(user),
-            'ldap_automount': ldap_create_automount(user),
+            'homedir': create_home_dir(user['username']),
+            'ldap_automount': ldap_create_automount(user['username']),
             'kerberos_principal': kerberos_create_principal(user),
-            'homedir': create_homedir(user['username']),  # FIXME run ssh script?
             'radius': radius_create_user(user['username'], user['password'])
         }
-        # import pprint; pprint.pprint(results)
+        import pprint; pprint.pprint(results)
 
         return JsonResponse({'results': 'success'})
 

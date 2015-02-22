@@ -91,4 +91,48 @@ class LdapGroup(ldapdb.models.Model):
     def __unicode__(self):
         return self.name
 
-# TODO Automount: http://www.openldap.org/faq/data/cache/599.html
+
+class LdapAutomountMap(ldapdb.models.Model):
+    """
+    Represents an LDAP automountMap
+    Ref: http://www.openldap.org/faq/data/cache/599.html
+    """
+
+    connection_name = 'ldap'
+
+    # LDAP meta-data
+    base_dn = settings.LDAP_AUTOMOUNT_DN
+    object_classes = ['automountMap']
+
+    ou = CharField(db_column='ou', primary_key=True)  # F.ex auto.home
+
+    def __unicode__(self):
+        return self.ou
+
+
+class LdapAutomountHome(ldapdb.models.Model):
+    """
+    Represents an LDAP automount with hardcoded 'auto.home' in the base_dn (!)
+    Ref: http://www.openldap.org/faq/data/cache/599.html
+    Ref: http://lists.bolloretelecom.eu/pipermail/django-ldapdb/2012-April/000113.html
+    """
+
+    connection_name = 'ldap'
+
+    # LDAP meta-data
+    base_dn = 'ou=auto.home,{}'.format(settings.LDAP_AUTOMOUNT_DN)
+    object_classes = ['automount']
+
+    username = CharField(db_column='cn', primary_key=True)
+    automountInformation = CharField(db_column='automountInformation')
+
+    def set_automount_info(self, username=None):
+        krb5_automount_info = "-fstype=nfs4,rw,sec=krb5 {}:{}/{}".format(
+            settings.FILESERVER_HOST,
+            settings.FILESERVER_HOME_PATH,
+            username if username is not None else self.username)
+
+        self.automountInformation = krb5_automount_info
+
+    def __unicode__(self):
+        return self.username

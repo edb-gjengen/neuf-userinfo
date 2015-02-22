@@ -9,14 +9,14 @@
     python manage.py runserver
 
 ## LDAP
-    sudo docker run -e LDAP_DOMAIN=neuf.no -e LDAP_ORGANISATION="Neuf" -e LDAP_ROOTPASS="toor" -p 389:389 -d osixia/openldap
-    ldapadd -D "cn=admin,dc=neuf,dc=no" -w "toor" -f test/testdata.ldif
+    sudo docker run -e LDAP_DOMAIN=neuf.no -e LDAP_ORGANISATION="Neuf" -e LDAP_ADMIN_PWD="toor" -p 389:389 -d nikolaik/docker-openldap
+    ldapadd -D "cn=admin,dc=neuf,dc=no" -w "toor" -f test/testdata.ldif  # Testdata
     # Verify import
     ldapsearch -x -b dc=neuf,dc=no
     # Login with test@example.com:test
 
 ## Inside
-    # create the Inside database tables, if they don't exist already
+    # create the Inside database tables, if they don't exist already:
     python manage.py syncdb --database=inside
 
 For simple dev you need at least:
@@ -25,30 +25,25 @@ For simple dev you need at least:
     * 1 UserGroupRelationShip (din_usergrouprelationship)
 
 ## RADIUS
-    # create the radius database tables, if they don't exist already
+    # create the radius database tables, if they don't exist already:
     python manage.py syncdb --database=radius
 
-
-# External dependencies:
- - LDAP: Read the tutorial on [Howto setup a LDAP server with Docker](https://edb.neuf.no/wiki/index.php?title=Howto_setup_a_LDAP_server_with_Docker)
- - Kerberos: TODO
- - RADIUS: TODO
- - Inside: Never going away! See https://git.neuf.no/edb/inside#tab-readme for code and installation
-
+## Homedirs
+ - settings.FILESERVER_HOST:~/.ssh/authorized_keys must contain the public key of settings.FILESERVER_USER
+ - settings.FILESERVER_USER might need some sudo access
 
 # TODO
- - Rewrite usersync.neuf.no as one or more endpoints
-    - Create new user in LDAP (username, first_name, last_name, email)
-    - add to groups (usergroup, dns-alle), it not exists, create
-    - Set LDAP password
-    - Create automount entry
-    - Create kerberos principal and set password
-    - Create homedir on wii
-    - Set RADIUS password
+ - Rewrite usersync.neuf.no as one or more endpoints [DONE?]
+ - On password update, then update ldap hash on InsideUser.ldap_password
+ - allow non LDAP-users (conditional LDAP-stuff), because we don't want LDAP filled with non-active members
  - Integrity check view which provides two way diffs for the following:
     - user vs user group
     - user vs kerberos principal
     - user vs auto mount entry
  - Add email addr alias (usernam@s.no, firstname.lastname@s.n)
- - On password update, then update ldap hash on InsideUser.ldap_password
- - allow non LDAP-users (conditional LDAP-stuff), because we don't want LDAP filled with non-active members
+
+# External dependencies:
+ - LDAP: Read the tutorial on [Howto setup a LDAP server with Docker](https://edb.neuf.no/wiki/index.php?title=Howto_setup_a_LDAP_server_with_Docker)
+ - Kerberos: TODO
+ - RADIUS: Standard MySQL.
+ - Inside: Never going away! See https://git.neuf.no/edb/inside#tab-readme for code and installation

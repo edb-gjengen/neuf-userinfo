@@ -213,8 +213,9 @@ INSIDE_USERSYNC_API_KEY = ''
 INSIDE_USERSYNC_ENC_KEY = ''
 
 # Home dir
-FILESERVER_HOST = "wii.neuf.no"
-FILESERVER_HOME_PATH = "/fileserver/homes"
+FILESERVER_HOST = "localhost"
+FILESERVER_USER = 'nikolark'  # change this to your own user for development
+FILESERVER_HOME_PATH = "/tmp/homes"
 
 try:
     from local_settings import *

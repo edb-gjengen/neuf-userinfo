@@ -1,11 +1,9 @@
 # coding: utf-8
 from __future__ import unicode_literals
-import json
 from django.conf import settings
-
+import logging
 import os
 from passlib.hash import ldap_salted_sha1
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -63,12 +61,14 @@ def ldap_create_user(user):
         user_groups = LdapGroup.objects.filter(gid__gte=settings.LDAP_USER_GID_MIN, gid__lte=settings.LDAP_USER_GID_MAX)
         user_groups = user_groups.order_by('-gid').values_list('gid', flat=True)
 
+        if len(user_groups) == 0:
+            return settings.LDAP_USER_GID_MIN
+
         if len(user_groups) > 0 and user_groups[0] >= settings.LDAP_USER_GID_MAX:
             logger.exception("UID larger than LDAP_USER_GID_MAX")
 
         return user_groups[0] + 1
 
-    groups = user.pop('groups')
     # User
     full_name = '{} {}'.format(user['firstname'], user['lastname'])
     user_data = {
@@ -92,15 +92,20 @@ def ldap_create_user(user):
     ldap_user_group.save()
 
     # Add groups
-    ldap_groups = LdapGroup.objects.filter(name__in=groups)
+    ldap_groups = LdapGroup.objects.filter(name__in=user['groups'])
     for g in ldap_groups:
         if user['username'] not in g.members:
             g.members.append(user['username'])
             g.save()
 
     # Finito!
+    return True
 
 
-def ldap_create_automount(user):
-    # TODO
-    pass
+def ldap_create_automount(username):
+    from neuf_ldap.models import LdapAutomountHome
+    automount = LdapAutomountHome(username=username)
+    automount.set_automount_info()
+    automount.save()
+
+    return True

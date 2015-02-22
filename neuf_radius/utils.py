@@ -28,3 +28,4 @@ def set_radius_password(username, raw_password):
 
 def radius_create_user(username, password):
     set_radius_password(username, password)
+    return True
