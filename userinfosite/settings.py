@@ -96,8 +96,8 @@ DATABASES = {
     'ldap': {
         'ENGINE': 'ldapdb.backends.ldap',
         'NAME': 'ldap://localhost/',
-        'USER': 'uid=test,{}'.format(LDAP_USER_DN),
-        'PASSWORD': 'test',
+        'USER': 'cn=admin,dc=neuf,dc=no',
+        'PASSWORD': 'toor',
     },
     'radius': {
         'ENGINE': 'django.db.backends.mysql',
