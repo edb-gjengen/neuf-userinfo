@@ -74,7 +74,12 @@
             if(data.active) {
                 image = img_check;
                 title = 'Du har tilgang til trådløst nettverk';
-                data_content = 'Siste vellykkede pålogging: ' + data.last_successful_auth;
+                data_content = 'Siste vellykkede pålogging: ';
+                if(data.last_successful_auth != undefined) {
+                    data_content += data.last_successful_auth;
+                } else {
+                    data_content += 'Ukjent.'
+                }
             } else {
                 image = img_error;
                 title = 'Ingen trådløskonto';
@@ -87,7 +92,7 @@
         .done(function(data) {
             image = img_check;
             title = 'Gyldig DNS-konto for aktive';
-            data_content = '';
+            data_content = 'Din konto støtter felles innlogging og kan brukes f.eks på aktiv.neuf.no.';
             $("#sso").append(image).prop('title', title).attr('data-content', data_content).popover();
         })
         .fail(function() {
