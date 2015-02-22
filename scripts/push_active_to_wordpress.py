@@ -4,15 +4,14 @@ import subprocess
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "userinfosite.settings")
 
-from neuf_userinfo.models import LdapGroup, LdapUser
+from neuf_ldap.models import LdapGroup, LdapUser
 
 PHP_SCRIPT_PATH = '/var/www/neuf.no/userinfo/scripts'
 OUT_FILENAME = os.path.join(PHP_SCRIPT_PATH, "users_in_group_active.json")
 
-usernames = LdapGroup.objects.get(posix_name="dns-aktiv").usernames
-users = LdapUser.objects.filter(username__in=usernames)
-users_out = [[u.username, u.first_name, u.last_name, u.email] for u in users]
-
+active_members = LdapGroup.objects.get(name="dns-aktiv").members
+active_users = LdapUser.objects.filter(username__in=active_members)
+users_out = [[u.username, u.first_name, u.last_name, u.email] for u in active_users]
 
 out_file = codecs.open(OUT_FILENAME, "w", encoding="utf-8")
 json.dump(users_out, out_file, ensure_ascii=False)
