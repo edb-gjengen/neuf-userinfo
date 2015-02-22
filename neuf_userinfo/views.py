@@ -18,7 +18,6 @@ import logging
 
 from inside.models import InsideUser
 from neuf_kerberos.utils import kerberos_create_principal
-from neuf_ldap.models import LdapGroup, LdapUser
 from neuf_ldap.utils import ldap_create_user, ldap_create_automount
 from neuf_radius.utils import radius_create_user
 from neuf_userinfo.forms import NewUserForm
@@ -35,7 +34,7 @@ def index(request):
             login(request, form.get_user())
     else:
         if request.user.is_authenticated():
-            return HttpResponseRedirect(reverse('neuf_userinfo.views.profile'))
+            return HttpResponseRedirect(reverse('my-profile'))
         else:
             form = AuthenticationForm(request)
 
@@ -43,34 +42,18 @@ def index(request):
 
 
 @login_required
-def profile(request, username=None):
-    if not username:
-        user = request.user
-        username = request.user.username
-    else:
+def profile(request, username=''):
+    if username != '' and not request.user.is_superuser:
         # Only allow superusers
-        if not request.user.is_superuser:
-            return HttpResponseNotFound()
+        return HttpResponseNotFound()
 
+    if username != '':
         user = get_object_or_404(User, username=username)
-
-    # TODO: Move LDAP stuff to JSON-view and load via AJAX (more fault tolerant)
-    ldap_user = None
-    ldap_groups = None
-    ldap_private_group = None
-    try:
-        ldap_user = LdapUser.objects.get(username=username)
-    except LdapUser.DoesNotExist:
-        pass
-
-    if ldap_user:
-        ldap_groups = LdapGroup.objects.filter(usernames__contains=username)
-        ldap_private_group = LdapGroup.objects.get(gid=ldap_user.group)
+    else:
+        user = request.user
 
     response = {
-        'ldap_user': ldap_user,
-        'ldap_groups': ldap_groups,
-        'ldap_private_group': ldap_private_group,
+        'groups': user.groups.all(),
         'user': user
     }
     return render(request, 'private/profile.html', response)

@@ -52,7 +52,8 @@ class LdapUser(ldapdb.models.Model):
     # Hack to use django internals for password reset
     last_login = datetime.datetime(2001, 1, 1)
 
-    def _days_since_1970(self):
+    @staticmethod
+    def _days_since_1970():
         epoch = datetime.datetime.utcfromtimestamp(0)
         today = datetime.datetime.today()
         delta = today - epoch
@@ -62,7 +63,7 @@ class LdapUser(ldapdb.models.Model):
     def set_password(self, raw_password, commit=True):
         self.password = ldap_create(raw_password)
         # Update last changed password date
-        self.shadowLastChange = self._days_since_1970()
+        self.shadowLastChange = LdapUser._days_since_1970()
 
         if commit:
             self.save()

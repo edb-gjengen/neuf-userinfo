@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django_extensions',
 )
 INSTALLED_APPS += (
+    'rest_framework',
     'neuf_userinfo',
     'neuf_ldap',
     'neuf_radius',
@@ -196,18 +197,17 @@ AUTH_LDAP_E_USER_FLAGS_BY_GROUP = AUTH_LDAP_U_USER_FLAGS_BY_GROUP
 AUTH_LDAP_E_USER_ATTR_MAP = AUTH_LDAP_U_USER_ATTR_MAP
 AUTH_LDAP_E_ALWAYS_UPDATE_USER = AUTH_LDAP_U_ALWAYS_UPDATE_USER
 
-# Debug logging
-import logging
-logger = logging.getLogger('django_auth_ldap')
-logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.DEBUG)
-
 # Kerberos realm
 KERBEROS_REALM = "NEUF.NO"
 KERBEROS_PASSWORD_CHANGING_PRINCIPAL = 'brukerinfo'
 KERBEROS_PASSWORD = ''
 
 # Inside
+INSIDE_USER_FLAGS_SYNC = {
+    "is_active": "dns-alle",
+    # "is_staff": "edb",
+    # "is_superuser": "edbadmin"
+}
 INSIDE_GROUPS_SYNC_DELETE = True  # When user logs in, groups are synced (locally in Django), this deletes aswell
 INSIDE_USERSYNC_API_KEY = ''
 INSIDE_USERSYNC_ENC_KEY = ''
@@ -216,6 +216,11 @@ INSIDE_USERSYNC_ENC_KEY = ''
 FILESERVER_HOST = "localhost"
 FILESERVER_USER = 'nikolark'  # change this to your own user for development
 FILESERVER_HOME_PATH = "/tmp/homes"
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
+    'PAGINATE_BY': 10
+}
 
 try:
     from local_settings import *

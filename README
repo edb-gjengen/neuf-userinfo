@@ -33,9 +33,7 @@ For simple dev you need at least:
  - settings.FILESERVER_USER might need some sudo access
 
 # TODO
- - Rewrite usersync.neuf.no as one or more endpoints [DONE?]
  - On password update, then update ldap hash on InsideUser.ldap_password
- - allow non LDAP-users (conditional LDAP-stuff), because we don't want LDAP filled with non-active members
  - Integrity check view which provides two way diffs for the following:
     - user vs user group
     - user vs kerberos principal

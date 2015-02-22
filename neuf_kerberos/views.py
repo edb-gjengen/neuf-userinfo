@@ -1,14 +1,14 @@
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from neuf_kerberos.utils import get_kerberos_principal, format_krb5_date
 
 
-@login_required
+@api_view(['GET', 'OPTIONS', 'HEAD'])
 def client_status(request):
-    krb5_principal = get_kerberos_principal(request.GET.get('username'))
+    krb5_principal = get_kerberos_principal(request.QUERY_PARAMS.get('username'))
     if not krb5_principal:
-        return JsonResponse({'active': False})
+        return Response({'active': False})
 
     last_succ_auth = format_krb5_date(krb5_principal['Last successful authentication'])
     status = {
@@ -17,4 +17,4 @@ def client_status(request):
         'last_modified': krb5_principal['Last modified']
     }
 
-    return JsonResponse(status)
+    return Response(status)

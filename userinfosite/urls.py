@@ -9,9 +9,11 @@ admin.autodiscover()
 urlpatterns = patterns(
     '',
     url(r'', include('neuf_userinfo.urls')),
+    url(r'', include('neuf_ldap.urls')),
     url(r'^userstatus/client/$', 'neuf_kerberos.views.client_status'),
     url(r'^userstatus/wireless/$', 'neuf_radius.views.wireless_status'),
 
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', include(admin.site.urls)),
 )
 

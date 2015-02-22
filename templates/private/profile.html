@@ -18,6 +18,7 @@
         <h2>Dine tjenester</h2>
         <div class="well">
             <ul>
+                <li><span id="sso">Felles innlogging (DNS-konto)</span></li>
                 <li><span id="wireless_status">Trådløst nettverk</span></li>
                 <li><span id="client_status">Foreningsmaskiner</span></li>
             </ul>
@@ -27,9 +28,8 @@
         <h2>Dine grupper</h2>
         <div class="well">
             <ul>
-            {% if ldap_groups %}
-                {% if ldap_private_group %}<li>{{ ldap_private_group }}</li>{% endif %}
-                {% for group in ldap_groups %}
+            {% if groups %}
+                {% for group in groups %}
                     {% if group = "dns-aktiv" %}
                         <li title="Du har tilgang til foreningsmaskinene.">{{ group }}</li>
                     {% else %}
@@ -50,7 +50,7 @@
     <script>
     $(function() {
         /* FIXME cleanup this mess */
-        var username = "{{username}}";
+        var username = "{{user.username}}";
         /* Display the service status of the user */
         var img_check = ' <img src="{{ STATIC_URL }}style/img/check.png" alt="OK" />';
         var img_error = ' <img src="{{ STATIC_URL }}style/img/exclamation_mark.png" alt="ERROR" />';
@@ -61,11 +61,11 @@
         $.getJSON("/userstatus/client/?format=json&username="+username, function(data) {
             if(data.active) {
                 image = img_check;
-                title = 'Du har en bruker til foreningsmaskinene.';
+                title = 'Du har en bruker til foreningsmaskinene';
                 data_content = 'Siste vellykkede pålogging: ' + data.last_successful_auth;
             } else {
                 image = img_error;
-                title = 'Ingen konto.';
+                title = 'Ingen konto';
                 data_content = 'Du mangler Kerberos principal.';
             }
             $("#client_status").append(image).prop('title', title).attr('data-content', data_content).popover();
@@ -73,14 +73,28 @@
         $.getJSON("/userstatus/wireless/?format=json&username="+username, function(data) {
             if(data.active) {
                 image = img_check;
-                title = 'Du har tilgang til trådløst nettverk.';
+                title = 'Du har tilgang til trådløst nettverk';
                 data_content = 'Siste vellykkede pålogging: ' + data.last_successful_auth;
             } else {
                 image = img_error;
-                title = 'Ingen trådløskonto.';
-                data_content = 'Du har ikke en trådløskonto i Radius.' + data.last_successful_auth;
+                title = 'Ingen trådløskonto';
+                data_content = 'Du har ikke en trådløskonto i Radius.';
             }
             $("#wireless_status").append(image).prop('title', title).attr('data-content', data_content).popover();
+        });
+
+        $.getJSON("/ldap/users/"+username+"/")
+        .done(function(data) {
+            image = img_check;
+            title = 'Gyldig DNS-konto for aktive';
+            data_content = '';
+            $("#sso").append(image).prop('title', title).attr('data-content', data_content).popover();
+        })
+        .fail(function() {
+            image = img_error;
+            title = 'Ingen DNS-konto for aktive';
+            data_content = 'Kun medlemmer av gruppen dns-aktiv kan bruke felles innlogging.';
+            $("#sso").append(image).prop('title', title).attr('data-content', data_content).popover();
         });
     });
 
