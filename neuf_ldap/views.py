@@ -1,6 +1,6 @@
 from neuf_ldap.models import LdapGroup, LdapUser
 from neuf_ldap.serializers import UserSerializer, GroupSerializer
-from rest_framework import viewsets, filters
+from rest_framework import viewsets
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -23,8 +23,6 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = LdapGroup.objects.all()
     serializer_class = GroupSerializer
-    filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('members',)
 
     def get_queryset(self):
         if self.request.user.is_superuser:
