@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from django.db import connections
 import logging
+from neuf_ldap.utils import ldap_create
 from passlib.hash import mysql41
 
 from inside.models import InsideUser, UserUpdate
@@ -25,6 +26,7 @@ def log_inside_userupdate(username, message):
 
 
 def set_inside_password(username, raw_password):
+    ldap_hashed_password = ldap_create(raw_password)
     hashed_password = mysql_create(raw_password)
 
     try:
@@ -34,6 +36,7 @@ def set_inside_password(username, raw_password):
         return
 
     user.password = hashed_password
+    user.ldap_password = ldap_hashed_password
     user.save()
 
     log_inside_userupdate(username, "Satt passord på nytt via brukerinfo.neuf.no.")

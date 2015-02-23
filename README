@@ -9,7 +9,7 @@
     python manage.py runserver
 
 ## LDAP
-    sudo docker run -e LDAP_DOMAIN=neuf.no -e LDAP_ORGANISATION="Neuf" -e LDAP_ADMIN_PWD="toor" -p 389:389 -d nikolaik/docker-openldap
+    sudo docker run -e LDAP_DOMAIN=neuf.no -e LDAP_ORGANISATION="Neuf" -e LDAP_ADMIN_PWD="toor" -p 389:389 -d nikolaik/openldap
     ldapadd -D "cn=admin,dc=neuf,dc=no" -w "toor" -f test/testdata.ldif  # Testdata
     # Verify import
     ldapsearch -x -b dc=neuf,dc=no
@@ -33,7 +33,9 @@ For simple dev you need at least:
  - settings.FILESERVER_USER might need some sudo access
 
 # TODO
- - On password update, then update ldap hash on InsideUser.ldap_password
+ - Add management command that creates LDAP users...
+   - when user is in Inside group dns-aktiv
+   - and not in LDAP allready
  - Integrity check view which provides two way diffs for the following:
     - user vs user group
     - user vs kerberos principal

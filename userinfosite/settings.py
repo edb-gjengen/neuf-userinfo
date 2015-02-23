@@ -217,6 +217,14 @@ FILESERVER_HOST = "localhost"
 FILESERVER_USER = 'nikolark'  # change this to your own user for development
 FILESERVER_HOME_PATH = "/tmp/homes"
 
+# Wordpress sync
+WP_PHP_SCRIPT_PATH = os.path.join(BASE_DIR, 'scripts')
+WP_OUT_FILENAME = os.path.join(WP_PHP_SCRIPT_PATH, "users_in_group_active.json")
+WP_LOAD_PATHS = [
+    "/var/www/studentersamfundet.no/www/wp/wp-load.php",
+    "/var/www/neuf.no/aktivweb/wp-load.php"
+]
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
     'PAGINATE_BY': 10

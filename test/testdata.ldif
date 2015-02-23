@@ -38,28 +38,30 @@ dn: cn=test,ou=Groups,dc=neuf,dc=no
 objectClass: posixGroup
 cn: test
 gidNumber: 10005
-description: Group account
 
 # Sample groups (matches settings-sample.py)
 dn: cn=dns-alle,ou=Groups,dc=neuf,dc=no
 objectClass: posixGroup
 cn: dns-alle
 gidNumber: 1
-description: Group account
 memberUid: test
 
 dn: cn=edb,ou=Groups,dc=neuf,dc=no
 objectClass: posixGroup
 cn: edb
 gidNumber: 2
-description: Group account
 memberUid: test
 
 dn: cn=edbadmin,ou=Groups,dc=neuf,dc=no
 objectClass: posixGroup
 cn: edbadmin
 gidNumber: 3
-description: Group account
+memberUid: test
+
+dn: cn=dns-aktiv,ou=Groups,dc=neuf,dc=no
+objectClass: posixGroup
+cn: dns-aktiv
+gidNumber: 4
 memberUid: test
 
 # Root dn for all automounts

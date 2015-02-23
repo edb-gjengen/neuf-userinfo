@@ -351,6 +351,7 @@ class InsideUser(models.Model):
     registration_status = models.CharField(max_length=255)
     created = models.DateTimeField(blank=True, null=True)
     membership_trial = models.CharField(max_length=255)
+    ldap_password = models.CharField(max_length=255, null=True)
 
     # ugly hack to use django internals for password reset
     last_login = datetime.datetime(2001, 1, 1)
