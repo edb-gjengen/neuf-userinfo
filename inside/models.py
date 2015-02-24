@@ -125,6 +125,12 @@ class InsideGroup(models.Model):
     mailinglist = models.CharField(max_length=50)
     posix_group = models.CharField(max_length=128)
 
+    def __unicode__(self):
+        if self.posix_group == '':
+            return self.name
+
+        return '{} ({})'.format(self.name, self.posix_group)
+
     class Meta:
         managed = False
         db_table = 'din_group'
