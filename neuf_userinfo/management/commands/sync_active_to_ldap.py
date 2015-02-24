@@ -35,7 +35,7 @@ class Command(BaseCommand):
         ldap_users = LdapUser.objects.filter(username__in=ldap_active_members)
         ldap_users_diffable = []
         for u in ldap_users:
-            ldap_groups = LdapGroup.objects.filter(members__contain=u.username).values_list('name', flat=True)
+            ldap_groups = LdapGroup.objects.filter(members__contains=u.username).values_list('name', flat=True)
             ldap_users_diffable.append({
                 'username': u.username,
                 'first_name': u.first_name,
