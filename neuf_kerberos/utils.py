@@ -30,6 +30,10 @@ def get_kerberos_principal(username):
     return cleaned_output
 
 
+def has_kerberos_principal(username):
+    return get_kerberos_principal(username) is not None
+
+
 def set_kerberos_password(username, raw_password):
     principal = "{}@{}".format(username, settings.KERBEROS_REALM)
     kadmin_query = " -p {} -w {} -q 'change_password -pw {} {}'".format(

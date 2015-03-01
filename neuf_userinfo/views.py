@@ -17,11 +17,8 @@ from django.views.generic import View
 import logging
 
 from inside.models import InsideUser
-from neuf_kerberos.utils import kerberos_create_principal
-from neuf_ldap.utils import ldap_create_user, ldap_create_automount
-from neuf_radius.utils import radius_create_user
 from neuf_userinfo.forms import NewUserForm
-from neuf_userinfo.ssh import create_home_dir
+from neuf_userinfo.utils import add_new_user
 
 logger = logging.getLogger(__name__)
 
@@ -117,15 +114,7 @@ def password_reset_confirm(request, uidb64=None, token=None,
 class AddNewUserView(View):
 
     def get(self, request):
-        """
-            - Create new user in LDAP (username, first_name, last_name, email)
-            - Add to groups (usergroup, dns-alle), it not exists, create
-            - Set LDAP password
-            - Create automount entry
-            - Create kerberos principal and set password
-            - Create homedir on wii
-            - Set RADIUS password
-        """
+        """ Adds a new user to all our internal services. See .utils.add_new_user for details. """
 
         if not self.validate_api_key(request.GET.get('api_key', '')):
             return JsonResponse({'errors': 'Invalid api_key'})
@@ -136,15 +125,7 @@ class AddNewUserView(View):
 
         user = form.cleaned_data
 
-        results = {
-            'user': user,
-            'ldap_user': ldap_create_user(user),
-            'homedir': create_home_dir(user['username']),
-            'ldap_automount': ldap_create_automount(user['username']),
-            'kerberos_principal': kerberos_create_principal(user['username'], user['password']),
-            'radius': radius_create_user(user['username'], user['password'])
-        }
-        logger.debug(results)
+        add_new_user(user)
 
         return JsonResponse({'results': 'success'})
 

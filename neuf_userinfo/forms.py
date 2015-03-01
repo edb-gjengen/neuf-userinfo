@@ -15,12 +15,11 @@ from django.utils.translation import ugettext as _
 from inside.models import InsideUser
 from inside.utils import set_inside_password
 
-from neuf_kerberos.utils import set_kerberos_password
-from neuf_ldap.models import LdapGroup, LdapUser
+from neuf_kerberos.utils import set_kerberos_password, has_kerberos_principal
 from neuf_radius.utils import set_radius_password
 from neuf_ldap.utils import set_ldap_password, ldap_username_exists, ldap_user_group_exists
 from neuf_userinfo.utils import decrypt_rijndael
-from neuf_userinfo.validators import PasswordValidator, UsernameValidator
+from neuf_userinfo.validators import UsernameValidator, validate_password
 
 
 class NeufSetPasswordForm(SetPasswordForm):
@@ -42,9 +41,11 @@ class NeufSetPasswordForm(SetPasswordForm):
         set_inside_password(username, password)
 
         # Active services
-        set_kerberos_password(username, password)
-        set_radius_password(username, password)
+        set_radius_password(username, password)  # creates user if non-existant
         set_ldap_password(username, password)
+
+        if has_kerberos_principal(username):
+            set_kerberos_password(username, password)
 
         return self.user  # Local Django User
 
@@ -52,7 +53,7 @@ class NeufSetPasswordForm(SetPasswordForm):
         raw_password = self.cleaned_data.get('new_password1')
 
         MinLengthValidator(8)(raw_password)
-        PasswordValidator(raw_password)
+        validate_password(raw_password)
 
         return raw_password
 
@@ -144,10 +145,18 @@ class NewUserForm(forms.Form):
     def clean_password(self):
         raw_password = self.cleaned_data['password']
         password = decrypt_rijndael(settings.INSIDE_USERSYNC_ENC_KEY, raw_password)
-        PasswordValidator(password)
+        MinLengthValidator(8)(raw_password)
+        validate_password(password)
 
         return password
 
     def clean_groups(self):
         groups = self.cleaned_data['groups']
         return groups.strip().split(',')
+
+    def clean(self):
+        cleaned_data = super(NewUserForm, self).clean()
+        # Rename firstname to first_name and lastname to last_name
+        cleaned_data['first_name'] = cleaned_data.pop('firstname')
+        cleaned_data['last_name'] = cleaned_data.pop('lastname')
+        return cleaned_data

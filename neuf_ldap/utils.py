@@ -1,5 +1,6 @@
 # coding: utf-8
 from __future__ import unicode_literals
+import pprint
 from django.conf import settings
 import logging
 import os
@@ -25,6 +26,7 @@ def set_ldap_password(username, raw_password):
         user = LdapUser.objects.get(username=username)
         user.set_password(raw_password)
     except LdapUser.DoesNotExist:
+        # Ignore
         pass
 
 
@@ -40,7 +42,7 @@ def ldap_username_exists(username):
     return len(LdapUser.objects.filter(username=username)) != 0
 
 
-def ldap_create_user(user):
+def ldap_create_user(user, dry_run=False):
     from neuf_ldap.models import LdapUser, LdapGroup
 
     def _get_next_uid():
@@ -70,10 +72,10 @@ def ldap_create_user(user):
         return user_groups[0] + 1
 
     # User
-    full_name = '{} {}'.format(user['firstname'], user['lastname'])
+    full_name = '{} {}'.format(user['first_name'], user['last_name'])
     user_data = {
-        'first_name': user['firstname'],
-        'last_name': user['lastname'],
+        'first_name': user['first_name'],
+        'last_name': user['last_name'],
         'full_name': full_name,
         'display_name': full_name,
         'gecos': full_name,
@@ -82,24 +84,74 @@ def ldap_create_user(user):
         'id': _get_next_uid(),
         'group': _get_next_user_gid(),
         'home_directory': os.path.join(settings.LDAP_HOME_DIRECTORY_PREFIX, user['username'])
+        # TODO you are here: AttributeError: 'NoneType' object has no attribute 'startswith'
+        # $ python manage.py sync_active_to_ldap --dry-run -v3
     }
     ldap_user = LdapUser(**user_data)
-    ldap_user.set_password(user['password'], commit=False)
-    ldap_user.save()
+
+    # User password
+    pwd_type = None
+    if user.get('password') is not None:
+        ldap_user.set_password(user['password'], commit=False)  # Raw
+        pwd_type = 'raw'
+    elif user.get('ldap_password') is not None:
+        ldap_user.password = user['ldap_password']  # Hashed
+        pwd_type = 'hashed'
+    else:
+        # No password
+        logger.exception("User {} has no ldap_password (hashed) or password (raw)!".format(user['username']))
+
+    if dry_run:
+        logger.debug('User saved with data: {} and password type \'{}\'.'.format(
+            pprint.pformat(user_data),
+            pwd_type))
+    else:
+        ldap_user.save()
 
     # Add user group
     ldap_user_group = LdapGroup(name=user['username'], gid=user_data['group'], members=[user['username']])
-    ldap_user_group.save()
+    if not dry_run:
+        ldap_user_group.save()
+    else:
+        logger.debug('User group {} created'.format(user['username']))
 
     # Add groups
     ldap_groups = LdapGroup.objects.filter(name__in=user['groups'])
     for g in ldap_groups:
         if user['username'] not in g.members:
             g.members.append(user['username'])
-            g.save()
+            if not dry_run:
+                g.save()
+            else:
+                logger.debug('User {} added to group {}'.format(user['username'], g.name))
 
     # Finito!
     return True
+
+
+def ldap_update_user_details(inside_user, dry_run=False):
+    from neuf_ldap.models import LdapUser
+    diff_attributes = ['username', 'email', 'groups']
+    ldap_user = LdapUser.objects.get(username=inside_user['username'])
+
+    for attr in diff_attributes:
+        setattr(ldap_user, attr, inside_user[attr])
+
+    name_changed = inside_user['first_name'] != ldap_user.first_name or inside_user['last_name'] != ldap_user.last_name
+    if name_changed:
+        full_name = '{} {}'.format(inside_user['first_name'], inside_user['last_name'])
+        name_data = {
+            'first_name': inside_user['first_name'],
+            'last_name': inside_user['last_name'],
+            'full_name': full_name,
+            'display_name': full_name,
+            'gecos': full_name,
+        }
+        for key, value in name_data.iteritems():
+            setattr(ldap_user, key, value)
+
+    if not dry_run:
+        ldap_user.save()
 
 
 def ldap_create_automount(username):

@@ -1,10 +1,37 @@
 # coding: utf-8
 from __future__ import unicode_literals
 import base64
+
+from neuf_ldap.utils import ldap_create_user
+from neuf_radius.utils import radius_create_user
+from neuf_userinfo.ssh import create_home_dir
 import rijndael
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def add_new_user(user, dry_run=False):
+    """
+        - Create new user in LDAP (username, first_name, last_name, email)
+        - Add to groups (usergroup, dns-alle), it not exists, create
+        - Set LDAP password
+        - Create homedir on wii
+        - Set RADIUS password
+        - (Create automount entry)
+        - (Create kerberos principal and set password)
+    """
+    results = {
+        'user': user,
+        'ldap_user': ldap_create_user(user, dry_run=dry_run),
+        'homedir': create_home_dir(user['username'], dry_run=dry_run),
+        # 'ldap_automount': ldap_create_automount(user['username']),  # FIXME disabled
+        # 'kerberos_principal': kerberos_create_principal(user['username'], user['password']),  # FIXME disabled
+    }
+    if user.get('password'):
+        results['radius'] = radius_create_user(user['username'], user['password'])
+
+    logger.debug(results)
 
 """
 Rijndael stuff, thank you SO!

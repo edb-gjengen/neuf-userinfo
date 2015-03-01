@@ -7,7 +7,7 @@ import os
 logger = logging.getLogger(__name__)
 
 
-def create_home_dir(username):
+def create_home_dir(username, dry_run=False):
     """
     Create homedir for username
      - Copy /etc/skel
@@ -34,8 +34,18 @@ def create_home_dir(username):
             logger.error("Path '{}:{}' already exists, doing nothing.".format(host, path))
             return False
 
-        run('cp -r /etc/skel {}'.format(path))
-        run('chown -R {0}:{0} {1}'.format(username, path))
-        run('chmod -R 700 {}'.format(path))
+        cp_skel_cmd = 'cp -r /etc/skel {}'.format(path)
+        chown_cmd = 'chown -R {0}:{0} {1}'.format(username, path)
+        chmod_cmd = 'chmod -R 700 {}'.format(path)
+        if not dry_run:
+            run(cp_skel_cmd)
+            run(chown_cmd)
+            run(chmod_cmd)
+        else:
+            logger.debug('Creating homedir on {} with cmds: {} {} {}'.format(
+                host_string,
+                cp_skel_cmd,
+                chown_cmd,
+                chmod_cmd))
 
     return True

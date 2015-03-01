@@ -46,14 +46,11 @@ class InsideBackend(object):
         return self.user
 
     def _update_user_details(self):
-        sync_attrs = {
-            'firstname': 'first_name',
-            'lastname': 'last_name',
-            'email': 'email'
-        }
-        for inside_attr, local_attr in sync_attrs.iteritems():
+        sync_attrs = ['first_name', 'last_name', 'email']
+
+        for attr in sync_attrs:
             # Copy from Inside user to local Django user
-            setattr(self.user, local_attr, getattr(self.inside_user, inside_attr))
+            setattr(self.user, attr, getattr(self.inside_user, attr))
 
     def _update_groups(self):
         existing_groups = list(self.user.groups.all())
