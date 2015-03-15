@@ -5,5 +5,7 @@ static/style/.sass-cache/
 local_settings.py
 venv
 .idea
+
+/staticfiles
 scripts/users_in_group_active.json
-staticfiles
+userinfo-active-to-wordpress.log
