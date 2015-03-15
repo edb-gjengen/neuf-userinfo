@@ -24,6 +24,7 @@ class Command(BaseCommand):
         ),)
 
     DIFF_ATTRIBUTES = ['first_name', 'last_name', 'email', 'groups']
+    SYNC_GROUP_PREFIX = 'dns-'
     COUNTS = dict(create=0, update=0, in_sync=0)
     options = {}
 
@@ -75,6 +76,7 @@ class Command(BaseCommand):
 
         for u in ldap_users:
             ldap_groups = LdapGroup.objects.filter(members__contains=u.username).values_list('name', flat=True)
+            ldap_groups = filter(lambda x: x.startswith(self.SYNC_GROUP_PREFIX), ldap_groups)
             ldap_users_diffable[u.username] = {
                 'username': u.username,
                 'first_name': u.first_name,
