@@ -75,8 +75,9 @@ class Command(BaseCommand):
         ldap_users = LdapUser.objects.filter(username__in=ldap_active_members)
 
         for u in ldap_users:
-            ldap_groups = LdapGroup.objects.filter(members__contains=u.username).values_list('name', flat=True)
-            ldap_groups = filter(lambda x: x.startswith(self.SYNC_GROUP_PREFIX), ldap_groups)
+            ldap_groups = LdapGroup.objects\
+                .filter(name__startswith=self.SYNC_GROUP_PREFIX, members__contains=u.username)\
+                .values_list('name', flat=True)
             ldap_users_diffable[u.username] = {
                 'username': u.username,
                 'first_name': u.first_name,
@@ -109,7 +110,7 @@ class Command(BaseCommand):
                 # In sync :-)
                 self.COUNTS['in_sync'] += 1
                 if int(self.options['verbosity']) == 3:
-                    self.stdout.write('[IN_SYNC] Inside user {} is in sync with LDAP'.format(username))
+                    self.stdout.write('[OK] Inside user {} is in sync with LDAP'.format(username))
 
     def stale_ldap_users(self, inside_users_diffable, ldap_users_diffable):
         for username, u in ldap_users_diffable.iteritems():
