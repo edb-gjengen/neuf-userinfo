@@ -23,7 +23,7 @@ class Command(BaseCommand):
             help='Dry run of syncronization, nothing is saved.'
         ),)
 
-    DIFF_ATTRIBUTES = ['username', 'first_name', 'last_name', 'email', 'groups']
+    DIFF_ATTRIBUTES = ['first_name', 'last_name', 'email', 'groups']
     COUNTS = dict(create=0, update=0, in_sync=0)
     options = {}
 
@@ -128,9 +128,19 @@ class Command(BaseCommand):
             if attr == 'groups':
                 # Compare set of group names
                 if set(inside_user[attr]) != set(ldap_user[attr]):
+                    if int(self.options['verbosity']) >= 2:
+                        self.stdout.write('{}: {} != {}'.format(
+                            inside_user['username'],
+                            ','.join(set(inside_user[attr])),
+                            ','.join(set(ldap_user[attr]))))
                     return False
             else:
                 if inside_user[attr] != ldap_user[attr]:
+                    if int(self.options['verbosity']) >= 2:
+                        self.stdout.write('{}: {} != {}'.format(
+                            inside_user['username'],
+                            inside_user[attr],
+                            ldap_user[attr]))
                     return False
 
         return True
