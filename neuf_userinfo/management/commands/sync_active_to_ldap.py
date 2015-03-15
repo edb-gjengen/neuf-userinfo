@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 
 from inside.models import InsideGroup, InsideUser
 from neuf_ldap.models import LdapGroup, LdapUser
@@ -49,6 +50,7 @@ class Command(BaseCommand):
         inside_users_diffable = {}
         group = InsideGroup.objects.get(posix_group=ACTIVE_USERS_GROUP)
         inside_users = InsideUser.objects.filter(group_rels__group=group)
+        inside_users = inside_users.exclude(Q(ldap_username__isnull=True) | Q(registration_status='partial'))
 
         for u in inside_users:
             inside_groups = InsideGroup.objects.filter(user_rels__user=u).exclude(posix_group='')
@@ -86,17 +88,17 @@ class Command(BaseCommand):
         return ldap_users_diffable
 
     def sync_users(self, inside_users_diffable, ldap_users_diffable):
-        for username, u in inside_users_diffable.iteritems():
+        for username, user in inside_users_diffable.iteritems():
             if username not in ldap_users_diffable:
                 # Create
-                add_new_user(u, dry_run=self.options['dry_run'])
+                add_new_user(user, dry_run=self.options['dry_run'])
 
                 self.COUNTS['create'] += 1
                 if int(self.options['verbosity']) >= 2:
                     self.stdout.write('Inside user {} is not in LDAP'.format(username))
-            elif not self.user_details_in_sync(u, ldap_users_diffable[username]):
+            elif not self.user_details_in_sync(user, ldap_users_diffable[username]):
                 # Update
-                ldap_update_user_details(u, dry_run=self.options['dry_run'])
+                ldap_update_user_details(user, dry_run=self.options['dry_run'])
 
                 self.COUNTS['update'] += 1
                 if int(self.options['verbosity']) >= 2:

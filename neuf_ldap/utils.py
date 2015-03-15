@@ -90,7 +90,6 @@ def ldap_create_user(user, dry_run=False):
     ldap_user = LdapUser(**user_data)
 
     # User password
-    pwd_type = None
     if user.get('password') is not None:
         ldap_user.set_password(user['password'], commit=False)  # Raw
         pwd_type = 'raw'
@@ -99,7 +98,8 @@ def ldap_create_user(user, dry_run=False):
         pwd_type = 'hashed'
     else:
         # No password
-        logger.exception("User {} has no ldap_password (hashed) or password (raw)!".format(user['username']))
+        logger.error("User {} has no ldap_password (hashed) or password (unhashed), bailing!".format(user['username']))
+        return False
 
     if dry_run:
         logger.debug('User saved with data: {} and password type \'{}\'.'.format(

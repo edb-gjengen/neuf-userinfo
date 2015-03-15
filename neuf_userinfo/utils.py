@@ -16,22 +16,21 @@ def add_new_user(user, dry_run=False):
         - Create new user in LDAP (username, first_name, last_name, email)
         - Add to groups (usergroup, dns-alle), it not exists, create
         - Set LDAP password
-        - Create homedir on wii
-        - Set RADIUS password
+        - Create homedir on fileserver
         - (Create automount entry)
         - (Create kerberos principal and set password)
+        - Set RADIUS password
     """
-    results = {
-        'user': user,
-        'ldap_user': ldap_create_user(user, dry_run=dry_run),
-        'homedir': create_home_dir(user['username'], dry_run=dry_run),
-        # 'ldap_automount': ldap_create_automount(user['username']),  # FIXME disabled
-        # 'kerberos_principal': kerberos_create_principal(user['username'], user['password']),  # FIXME disabled
-    }
-    if user.get('password'):
-        results['radius'] = radius_create_user(user['username'], user['password'])
+    if not ldap_create_user(user, dry_run=dry_run):
+        return
 
-    logger.debug(results)
+    create_home_dir(user['username'], dry_run=dry_run)
+    # ldap_create_automount(user['username']),  # FIXME disabled
+
+    # Needs raw password
+    if user.get('password'):
+        # kerberos_create_principal(user['username'], user['password']),  # FIXME disabled
+        radius_create_user(user['username'], user['password'])
 
 """
 Rijndael stuff, thank you SO!
