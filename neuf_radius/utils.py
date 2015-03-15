@@ -1,6 +1,11 @@
+# coding: utf-8
+from __future__ import unicode_literals
+import logging
 from passlib.hash import nthash
 
 from neuf_radius.models import Radcheck
+
+logger = logging.getLogger(__name__)
 
 
 def radius_create(raw_password):
@@ -26,6 +31,10 @@ def set_radius_password(username, raw_password):
     radius_user.save()
 
 
-def radius_create_user(username, password):
-    set_radius_password(username, password)
+def radius_create_user(username, password, dry_run=False):
+    if not dry_run:
+        set_radius_password(username, password)
+    else:
+        logger.debug('Setting radius password for \'{}\''.format(username))
+
     return True

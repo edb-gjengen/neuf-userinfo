@@ -30,7 +30,7 @@ def add_new_user(user, dry_run=False):
     # Needs raw password
     if user.get('password'):
         # kerberos_create_principal(user['username'], user['password']),  # FIXME disabled
-        radius_create_user(user['username'], user['password'])
+        radius_create_user(user['username'], user['password'], dry_run=dry_run)
 
 """
 Rijndael stuff, thank you SO!
