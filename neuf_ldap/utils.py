@@ -84,8 +84,6 @@ def ldap_create_user(user, dry_run=False):
         'id': _get_next_uid(),
         'group': _get_next_user_gid(),
         'home_directory': os.path.join(settings.LDAP_HOME_DIRECTORY_PREFIX, user['username'])
-        # TODO you are here: AttributeError: 'NoneType' object has no attribute 'startswith'
-        # $ python manage.py sync_active_to_ldap --dry-run -v3
     }
     ldap_user = LdapUser(**user_data)
 
