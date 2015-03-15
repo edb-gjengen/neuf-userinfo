@@ -95,25 +95,25 @@ class Command(BaseCommand):
 
                 self.COUNTS['create'] += 1
                 if int(self.options['verbosity']) >= 2:
-                    self.stdout.write('Inside user {} is not in LDAP'.format(username))
+                    self.stdout.write('[CREATED] Inside user {} is not in LDAP'.format(username))
             elif not self.user_details_in_sync(user, ldap_users_diffable[username]):
                 # Update
                 ldap_update_user_details(user, dry_run=self.options['dry_run'])
 
                 self.COUNTS['update'] += 1
                 if int(self.options['verbosity']) >= 2:
-                    self.stdout.write('Inside user {} is out of sync with LDAP'.format(username))
+                    self.stdout.write('[UPDATED] Inside user {} is out of sync with LDAP'.format(username))
             else:
                 # In sync :-)
                 self.COUNTS['in_sync'] += 1
                 if int(self.options['verbosity']) == 3:
-                    self.stdout.write('Inside user {} is in sync with LDAP'.format(username))
+                    self.stdout.write('[IN_SYNC] Inside user {} is in sync with LDAP'.format(username))
 
     def stale_ldap_users(self, inside_users_diffable, ldap_users_diffable):
         for username, u in ldap_users_diffable.iteritems():
             if username not in inside_users_diffable:
                 if int(self.options['verbosity']) >= 2:
-                    self.stdout.write('LDAP user {} is not in Inside'.format(username))
+                    self.stdout.write('LDAP user {} is not in list of to-be-synced users from Inside'.format(username))
 
     def log_totals(self):
         if self.COUNTS['create'] != 0:
