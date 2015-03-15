@@ -119,17 +119,18 @@ class Command(BaseCommand):
         if self.COUNTS['create'] != 0:
             self.stdout.write('{} Inside users not found in LDAP'.format(self.COUNTS['create']))
         if self.COUNTS['update'] != 0:
-            self.stdout.write('{} LDAP users were were update with info '.format(self.COUNTS['update']))
+            self.stdout.write('{} LDAP users were updated with new details'.format(self.COUNTS['update']))
         if int(self.options['verbosity']) >= 2:
             self.stdout.write('{} Inside users in sync with LDAP users '.format(self.COUNTS['in_sync']))
 
     def user_details_in_sync(self, inside_user, ldap_user):
         for attr in self.DIFF_ATTRIBUTES:
-            if inside_user[attr] != ldap_user[attr]:
-                # Groups are lists
-                if type(attr) != list:
+            if attr == 'groups':
+                # Compare set of group names
+                if set(inside_user[attr]) != set(ldap_user[attr]):
                     return False
-                elif set(inside_user[attr]) != set(ldap_user[attr]):
+            else:
+                if inside_user[attr] != ldap_user[attr]:
                     return False
 
         return True
