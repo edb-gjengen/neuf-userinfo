@@ -1,9 +1,10 @@
 # coding: utf-8
 from __future__ import unicode_literals
 import base64
+from neuf_kerberos.utils import add_kerberos_principal
 
-from neuf_ldap.utils import ldap_create_user
-from neuf_radius.utils import radius_create_user
+from neuf_ldap.utils import create_ldap_user, create_ldap_automount
+from neuf_radius.utils import create_radius_user
 from neuf_userinfo.ssh import create_home_dir
 import rijndael
 import logging
@@ -11,26 +12,25 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def add_new_user(user, dry_run=False):
+def add_new_user(user):
     """
         - Create new user in LDAP (username, first_name, last_name, email)
         - Add to groups (usergroup, dns-alle), it not exists, create
         - Set LDAP password
         - Create homedir on fileserver
-        - (Create automount entry)
-        - (Create kerberos principal and set password)
+        - Create automount entry
+        - Create kerberos principal and set password
         - Set RADIUS password
     """
-    if not ldap_create_user(user, dry_run=dry_run):
+    if not create_ldap_user(user):
         return
 
-    create_home_dir(user['username'], dry_run=dry_run)
-    # ldap_create_automount(user['username']),  # FIXME disabled
+    create_home_dir(user['username'])
+    create_ldap_automount(user['username']),
 
-    # Needs raw password
-    if user.get('password'):
-        # kerberos_create_principal(user['username'], user['password']),  # FIXME disabled
-        radius_create_user(user['username'], user['password'], dry_run=dry_run)
+    # Requires raw password
+    add_kerberos_principal(user['username'], user['password'])
+    create_radius_user(user['username'], user['password'])
 
 """
 Rijndael stuff, thank you SO!

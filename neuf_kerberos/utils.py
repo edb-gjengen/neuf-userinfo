@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 def get_kerberos_principal(username):
     principal = "{0}@{1}".format(username, settings.KERBEROS_REALM)
     kadmin_query = " -p '{0}' -w {1} -q 'get_principal {2}'".format(
-        settings.KERBEROS_PASSWORD_CHANGING_PRINCIPAL,
+        settings.KERBEROS_ADMIN_PRINCIPAL,
         settings.KERBEROS_PASSWORD,
         principal)
     p = Popen('kadmin' + kadmin_query, shell=True, stdout=PIPE, stderr=PIPE)
@@ -37,7 +37,7 @@ def has_kerberos_principal(username):
 def set_kerberos_password(username, raw_password):
     principal = "{}@{}".format(username, settings.KERBEROS_REALM)
     kadmin_query = " -p {} -w {} -q 'change_password -pw {} {}'".format(
-        settings.KERBEROS_PASSWORD_CHANGING_PRINCIPAL,
+        settings.KERBEROS_ADMIN_PRINCIPAL,
         settings.KERBEROS_PASSWORD,
         raw_password,
         principal)
@@ -59,22 +59,25 @@ def format_krb5_date(date):
     return formatted_date
 
 
-def kerberos_create_principal(username, password):
+def add_kerberos_principal(username, password, dry_run=False):
     principal = "{}@{}".format(username, settings.KERBEROS_REALM)
     kadmin_query = " -p '{}' -w {} -q 'add_principal {} -pw {}'".format(
-        settings.KERBEROS_PASSWORD_CHANGING_PRINCIPAL,
+        settings.KERBEROS_ADMIN_PRINCIPAL,
         settings.KERBEROS_PASSWORD,
         principal,
         password)
-    p = Popen('kadmin' + kadmin_query, shell=True, stdout=PIPE, stderr=PIPE)
-    output, error = p.communicate()
-    if error:
-        # KADM5_AUTH_ADD (requires "add" privilege)
-        # KADM5_BAD_MASK (shouldn't happen)
-        # KADM5_DUP (principal exists already)
-        # KADM5_UNK_POLICY (policy does not exist)
-        # KADM5_PASS_Q_* (password quality violations)
-        logger.error(error)
-        return False
+    if dry_run:
+        logger.debug('Kerberos principal {} added'.format(principal))
+    else:
+        p = Popen('kadmin' + kadmin_query, shell=True, stdout=PIPE, stderr=PIPE)
+        output, error = p.communicate()
+        if error:
+            # KADM5_AUTH_ADD (requires "add" privilege)
+            # KADM5_BAD_MASK (shouldn't happen)
+            # KADM5_DUP (principal exists already)
+            # KADM5_UNK_POLICY (policy does not exist)
+            # KADM5_PASS_Q_* (password quality violations)
+            logger.error(error)
+            return False
 
     return True

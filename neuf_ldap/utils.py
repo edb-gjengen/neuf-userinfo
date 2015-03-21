@@ -42,7 +42,7 @@ def ldap_username_exists(username):
     return len(LdapUser.objects.filter(username=username)) != 0
 
 
-def ldap_create_user(user, dry_run=False):
+def create_ldap_user(user, dry_run=False):
     from neuf_ldap.models import LdapUser, LdapGroup
 
     def _get_next_uid():
@@ -152,10 +152,14 @@ def ldap_update_user_details(inside_user, dry_run=False):
         ldap_user.save()
 
 
-def ldap_create_automount(username):
+def create_ldap_automount(username, dry_run=False):
     from neuf_ldap.models import LdapAutomountHome
     automount = LdapAutomountHome(username=username)
     automount.set_automount_info()
-    automount.save()
+
+    if dry_run:
+        logger.debug('Automount {} added for user {}'.format(automount.automountInformation, username))
+    else:
+        automount.save()
 
     return True

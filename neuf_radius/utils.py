@@ -31,7 +31,7 @@ def set_radius_password(username, raw_password):
     radius_user.save()
 
 
-def radius_create_user(username, password, dry_run=False):
+def create_radius_user(username, password, dry_run=False):
     if not dry_run:
         set_radius_password(username, password)
     else:

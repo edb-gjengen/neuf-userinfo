@@ -30,12 +30,9 @@ For simple dev you need at least:
 
 ## Homedirs
  - settings.FILESERVER_HOST:~/.ssh/authorized_keys must contain the public key of settings.FILESERVER_USER
- - settings.FILESERVER_USER might need some sudo access
+ - settings.FILESERVER_USER needs sudo access to FILESERVER_CREATE_HOMEDIR_SCRIPT
 
 # TODO
- - Add management command that creates LDAP users...
-   - when user is in Inside group dns-aktiv
-   - and not in LDAP allready
  - Integrity check view which provides two way diffs for the following:
     - user vs user group
     - user vs kerberos principal

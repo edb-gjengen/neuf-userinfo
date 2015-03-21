@@ -1,13 +1,12 @@
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 from inside.models import InsideGroup, InsideUser
 from neuf_ldap.models import LdapGroup, LdapUser
-from neuf_ldap.utils import ldap_create_user, ldap_update_user_details
+from neuf_ldap.utils import create_ldap_user, ldap_update_user_details, create_ldap_automount
 
 from optparse import make_option
-from neuf_userinfo.utils import add_new_user
+from neuf_userinfo.ssh import create_home_dir
 
 ACTIVE_USERS_GROUP = 'dns-aktiv'
 
@@ -94,7 +93,9 @@ class Command(BaseCommand):
         for username, user in inside_users_diffable.iteritems():
             if username not in ldap_users_diffable:
                 # Create
-                add_new_user(user, dry_run=self.options['dry_run'])
+                create_ldap_user(user, dry_run=self.options['dry_run'])
+                create_home_dir(user['username'], dry_run=self.options['dry_run'])
+                create_ldap_automount(user['username'], dry_run=self.options['dry_run'])
 
                 self.COUNTS['create'] += 1
                 if int(self.options['verbosity']) >= 2:

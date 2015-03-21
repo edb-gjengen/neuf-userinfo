@@ -199,7 +199,7 @@ AUTH_LDAP_E_ALWAYS_UPDATE_USER = AUTH_LDAP_U_ALWAYS_UPDATE_USER
 
 # Kerberos realm
 KERBEROS_REALM = "NEUF.NO"
-KERBEROS_PASSWORD_CHANGING_PRINCIPAL = 'brukerinfo'
+KERBEROS_ADMIN_PRINCIPAL = 'brukerinfo'
 KERBEROS_PASSWORD = ''
 
 # Inside
@@ -215,7 +215,8 @@ INSIDE_USERSYNC_ENC_KEY = ''
 # Home dir
 FILESERVER_HOST = "localhost"
 FILESERVER_USER = 'nikolark'  # change this to your own user for development
-FILESERVER_HOME_PATH = "/tmp/homes"
+FILESERVER_HOME_PATH = "/tmp/"
+FILESERVER_CREATE_HOMEDIR_SCRIPT = os.path.join(BASE_DIR, 'scripts', 'create_home_directory.sh')
 
 # Wordpress sync
 WP_PHP_SCRIPT_PATH = os.path.join(BASE_DIR, 'scripts')
