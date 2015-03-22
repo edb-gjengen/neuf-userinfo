@@ -61,11 +61,11 @@ def format_krb5_date(date):
 
 def add_kerberos_principal(username, password, dry_run=False):
     principal = "{}@{}".format(username, settings.KERBEROS_REALM)
-    kadmin_query = " -p '{}' -w {} -q 'add_principal {} -pw {}'".format(
+    kadmin_query = " -p {} -w {} -q 'add_principal -pw {} {}'".format(
         settings.KERBEROS_ADMIN_PRINCIPAL,
         settings.KERBEROS_PASSWORD,
-        principal,
-        password)
+        password,
+        principal)
 
     if not dry_run:
         p = Popen('kadmin' + kadmin_query, shell=True, stdout=PIPE, stderr=PIPE)
