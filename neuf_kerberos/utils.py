@@ -8,8 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 def get_kerberos_principal(username):
-    principal = "{0}@{1}".format(username, settings.KERBEROS_REALM)
-    kadmin_query = " -p '{0}' -w {1} -q 'get_principal {2}'".format(
+    principal = "{}@{}".format(username, settings.KERBEROS_REALM)
+    kadmin_query = " -p '{}' -w {} -q 'get_principal {}'".format(
         settings.KERBEROS_ADMIN_PRINCIPAL,
         settings.KERBEROS_PASSWORD,
         principal)
@@ -61,7 +61,7 @@ def format_krb5_date(date):
 
 def add_kerberos_principal(username, password, dry_run=False):
     principal = "{}@{}".format(username, settings.KERBEROS_REALM)
-    kadmin_query = " -p {} -w {} -q 'add_principal -pw {} {}'".format(
+    kadmin_query = " -p {} -w {} -q 'add_principal -policy default -pw {} {}'".format(
         settings.KERBEROS_ADMIN_PRINCIPAL,
         settings.KERBEROS_PASSWORD,
         password,
