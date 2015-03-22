@@ -13,6 +13,10 @@ class LdapUserAdmin(admin.ModelAdmin):
     list_display = ['username', 'first_name', 'last_name', 'email', 'id']
     search_fields = ['first_name', 'last_name', 'full_name', 'username']
 
+
+class LdapAutomountHomeAdmin(admin.ModelAdmin):
+    search_fields = ['username']
+
 admin.site.register(LdapGroup, LdapGroupAdmin)
 admin.site.register(LdapUser, LdapUserAdmin)
-admin.site.register(LdapAutomountHome)
+admin.site.register(LdapAutomountHome, LdapAutomountHomeAdmin)
