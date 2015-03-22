@@ -1,5 +1,6 @@
 # coding: utf-8
 from __future__ import unicode_literals
+from datetime import datetime
 import pprint
 from django.conf import settings
 import logging
@@ -46,29 +47,27 @@ def create_ldap_user(user, dry_run=False):
     from neuf_ldap.models import LdapUser, LdapGroup
 
     def _get_next_uid():
-        # Get user ids between min and max, and order desc by id
-        logger.debug('Getting next available UID')
-        users = LdapUser.objects.filter(id__gte=settings.LDAP_UID_MIN, id__lte=settings.LDAP_UID_MAX)
-        users = users.order_by('-id').values_list('id', flat=True)
+        # Get user id order desc by id
+        logger.debug('{} Getting next available UID'.format(datetime.utcnow()))
+        users = LdapUser.objects.order_by('-id').values_list('id', flat=True)
 
         if len(users) == 0:
             return settings.LDAP_UID_MIN
 
-        if len(users) > 0 and users[0] >= settings.LDAP_UID_MAX:
+        if users[0] >= settings.LDAP_UID_MAX:
             logger.exception("UID larger than LDAP_UID_MAX")
 
         return users[0] + 1
 
     def _get_next_user_gid():
-        logger.debug('Getting next available GID for user group')
-        # Get user group ids between min and max, and order desc by id
-        user_groups = LdapGroup.objects.filter(gid__gte=settings.LDAP_USER_GID_MIN, gid__lte=settings.LDAP_USER_GID_MAX)
-        user_groups = user_groups.order_by('-gid').values_list('gid', flat=True)
+        logger.debug('{} Getting next available GID for user group'.format(datetime.utcnow()))
+        # Get user group ids order desc by id
+        user_groups = LdapGroup.objects.order_by('-gid').values_list('gid', flat=True)
 
         if len(user_groups) == 0:
             return settings.LDAP_USER_GID_MIN
 
-        if len(user_groups) > 0 and user_groups[0] >= settings.LDAP_USER_GID_MAX:
+        if user_groups[0] >= settings.LDAP_USER_GID_MAX:
             logger.exception("UID larger than LDAP_USER_GID_MAX")
 
         return user_groups[0] + 1
@@ -101,32 +100,24 @@ def create_ldap_user(user, dry_run=False):
         logger.error("User {} has no ldap_password (hashed) or password (unhashed), bailing!".format(user['username']))
         return False
 
-    if dry_run:
-        logger.debug('User saved with data: {} and password type \'{}\'.'.format(
-            pprint.pformat(user_data),
-            pwd_type))
-    else:
-        logger.debug('Saving user with data: {} and password type \'{}\'.'.format(
-            pprint.pformat(user_data),
-            pwd_type))
+    if not dry_run:
         ldap_user.save()
+    logger.debug('User saved with data: {} and password type \'{}\'.'.format( pprint.pformat(user_data), pwd_type))
 
     # Add user group
     ldap_user_group = LdapGroup(name=user['username'], gid=user_data['group'], members=[user['username']])
-    if dry_run:
-        logger.debug('User group {} created'.format(user['username']))
-    else:
+    if not dry_run:
         ldap_user_group.save()
+    logger.debug('User group {} created'.format(user['username']))
 
     # Add groups
     ldap_groups = LdapGroup.objects.filter(name__in=user['groups'])
     for g in ldap_groups:
         if user['username'] not in g.members:
             g.members.append(user['username'])
-            if dry_run:
-                logger.debug('User {} added to group {}'.format(user['username'], g.name))
-            else:
+            if not dry_run:
                 g.save()
+            logger.debug('User {} added to group {}'.format(user['username'], g.name))
 
     # Finito!
     return True
@@ -155,6 +146,7 @@ def ldap_update_user_details(inside_user, dry_run=False):
 
     if not dry_run:
         ldap_user.save()
+    logger.debug('User details updated for {}'.format(inside_user['username']))
 
 
 def create_ldap_automount(username, dry_run=False):
@@ -162,9 +154,8 @@ def create_ldap_automount(username, dry_run=False):
     automount = LdapAutomountHome(username=username)
     automount.set_automount_info()
 
-    if dry_run:
-        logger.debug('Automount {} added for user {}'.format(automount.automountInformation, username))
-    else:
+    if not dry_run:
         automount.save()
+    logger.debug('Automount {} added for user {}'.format(automount.automountInformation, username))
 
     return True

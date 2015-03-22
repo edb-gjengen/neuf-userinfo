@@ -20,9 +20,8 @@ def create_home_dir(username, dry_run=False):
     with fab_settings(host_string=host_string, warn_only=True):
         script_cmd = '{} {} {}'.format(settings.FILESERVER_CREATE_HOMEDIR_SCRIPT, path, username)
 
-        if dry_run:
-            logger.debug('Created homedir on {} with command: {}'.format(host_string, script_cmd))
-        else:
+        logger.debug('Created homedir on {} with command: {}'.format(host_string, script_cmd))
+        if not dry_run:
             return_val = sudo(script_cmd, shell=False)
             if not return_val:
                 return False
