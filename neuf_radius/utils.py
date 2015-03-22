@@ -34,7 +34,7 @@ def set_radius_password(username, raw_password):
 def create_radius_user(username, password, dry_run=False):
     if not dry_run:
         set_radius_password(username, password)
-    else:
-        logger.debug('Setting radius password for \'{}\''.format(username))
+
+    logger.debug('Created radius user \'{}\''.format(username))
 
     return True

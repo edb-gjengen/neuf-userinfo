@@ -66,9 +66,8 @@ def add_kerberos_principal(username, password, dry_run=False):
         settings.KERBEROS_PASSWORD,
         principal,
         password)
-    if dry_run:
-        logger.debug('Kerberos principal {} added'.format(principal))
-    else:
+
+    if not dry_run:
         p = Popen('kadmin' + kadmin_query, shell=True, stdout=PIPE, stderr=PIPE)
         output, error = p.communicate()
         if error:
@@ -79,5 +78,6 @@ def add_kerberos_principal(username, password, dry_run=False):
             # KADM5_PASS_Q_* (password quality violations)
             logger.error(error)
             return False
+    logger.debug('Added kerberos principal {}'.format(principal))
 
     return True
