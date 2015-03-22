@@ -151,6 +151,11 @@ def ldap_update_user_details(inside_user, dry_run=False):
 
 def create_ldap_automount(username, dry_run=False):
     from neuf_ldap.models import LdapAutomountHome
+
+    if len(LdapAutomountHome.objects.filter(username=username)) != 0:
+        # Bail if it already exists
+        return True
+
     automount = LdapAutomountHome(username=username)
     automount.set_automount_info()
 

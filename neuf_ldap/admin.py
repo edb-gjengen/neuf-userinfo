@@ -1,5 +1,5 @@
 from django.contrib import admin
-from neuf_ldap.models import LdapGroup, LdapUser
+from neuf_ldap.models import LdapGroup, LdapUser, LdapAutomountHome
 
 
 class LdapGroupAdmin(admin.ModelAdmin):
@@ -15,3 +15,4 @@ class LdapUserAdmin(admin.ModelAdmin):
 
 admin.site.register(LdapGroup, LdapGroupAdmin)
 admin.site.register(LdapUser, LdapUserAdmin)
+admin.site.register(LdapAutomountHome)
