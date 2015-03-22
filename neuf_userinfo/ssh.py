@@ -16,7 +16,6 @@ def create_home_dir(username, dry_run=False):
     """
     host_string = '{}@{}'.format(settings.FILESERVER_SSH_USER, settings.FILESERVER_HOST)
     path = settings.FILESERVER_HOME_PATH
-
     my_fab_settings = {
         'user': settings.FILESERVER_SSH_USER,
         'key_filename': settings.FILESERVER_SSH_KEY_PATH,

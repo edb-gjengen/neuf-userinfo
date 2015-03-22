@@ -19,7 +19,7 @@ if ! id -u $USERNAME; then
         exit 1
 fi
 
-if [ -d "${HOME_DIRS_PATH}$/{USERNAME}" ] ; then
+if [ -d "${HOME_DIRS_PATH}/${USERNAME}" ] ; then
         echo "Cannot create home directory, it already exists..."
         exit 1
 fi
