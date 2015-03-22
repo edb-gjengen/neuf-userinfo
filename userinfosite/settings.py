@@ -214,7 +214,8 @@ INSIDE_USERSYNC_ENC_KEY = ''
 
 # Home dir
 FILESERVER_HOST = "localhost"
-FILESERVER_USER = 'nikolark'  # change this to your own user for development
+FILESERVER_SSH_USER = 'nikolark'  # change this to your own user for development
+FILESERVER_SSH_KEY_PATH = ''  # e.g. '/home/nikolark/.ssh/id_rsa'
 FILESERVER_HOME_PATH = "/tmp/"
 FILESERVER_CREATE_HOMEDIR_SCRIPT = os.path.join(BASE_DIR, 'scripts', 'create_home_directory.sh')
 
