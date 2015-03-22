@@ -124,7 +124,7 @@ class AddNewUserView(View):
             return JsonResponse({'errors': form.errors})
 
         user = form.cleaned_data
-
+        logger.debug('Adding user \'{}\'.'.format(user['username']))
         add_new_user(user)
 
         return JsonResponse({'results': 'success'})

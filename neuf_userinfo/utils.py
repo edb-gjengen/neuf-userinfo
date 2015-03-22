@@ -23,6 +23,7 @@ def add_new_user(user):
         - Set RADIUS password
     """
     if not create_ldap_user(user):
+        logger.debug('Could not create user \'{}\'.'.format(user['username']))
         return
 
     create_home_dir(user['username'])

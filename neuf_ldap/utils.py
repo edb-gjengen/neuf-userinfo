@@ -47,6 +47,7 @@ def create_ldap_user(user, dry_run=False):
 
     def _get_next_uid():
         # Get user ids between min and max, and order desc by id
+        logger.debug('Getting next available UID')
         users = LdapUser.objects.filter(id__gte=settings.LDAP_UID_MIN, id__lte=settings.LDAP_UID_MAX)
         users = users.order_by('-id').values_list('id', flat=True)
 
@@ -59,6 +60,7 @@ def create_ldap_user(user, dry_run=False):
         return users[0] + 1
 
     def _get_next_user_gid():
+        logger.debug('Getting next available GID for user group')
         # Get user group ids between min and max, and order desc by id
         user_groups = LdapGroup.objects.filter(gid__gte=settings.LDAP_USER_GID_MIN, gid__lte=settings.LDAP_USER_GID_MAX)
         user_groups = user_groups.order_by('-gid').values_list('gid', flat=True)
@@ -104,24 +106,27 @@ def create_ldap_user(user, dry_run=False):
             pprint.pformat(user_data),
             pwd_type))
     else:
+        logger.debug('Saving user with data: {} and password type \'{}\'.'.format(
+            pprint.pformat(user_data),
+            pwd_type))
         ldap_user.save()
 
     # Add user group
     ldap_user_group = LdapGroup(name=user['username'], gid=user_data['group'], members=[user['username']])
-    if not dry_run:
-        ldap_user_group.save()
-    else:
+    if dry_run:
         logger.debug('User group {} created'.format(user['username']))
+    else:
+        ldap_user_group.save()
 
     # Add groups
     ldap_groups = LdapGroup.objects.filter(name__in=user['groups'])
     for g in ldap_groups:
         if user['username'] not in g.members:
             g.members.append(user['username'])
-            if not dry_run:
-                g.save()
-            else:
+            if dry_run:
                 logger.debug('User {} added to group {}'.format(user['username'], g.name))
+            else:
+                g.save()
 
     # Finito!
     return True

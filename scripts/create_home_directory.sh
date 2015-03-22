@@ -1,5 +1,5 @@
 #!/bin/bash
-# Usage: ./create_home_directory.sh <path> <username>
+# Usage: $0 <path_to_home_dirs> <username>
 
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root." 1>&2
@@ -7,11 +7,11 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 if [ $# -ne 2 ] ; then
-        echo "USAGE $0 <path> <username>"
+        echo "USAGE $0 <path_to_home_dirs> <username>"
         exit 1
 fi
 
-HOME_DIR_PATH=$1
+HOME_DIRS_PATH=$1
 USERNAME=$2
 
 if ! id -u $USERNAME; then
@@ -19,11 +19,11 @@ if ! id -u $USERNAME; then
         exit 1
 fi
 
-if [ -d "${HOME_DIR_PATH}${USERNAME}" ] ; then
+if [ -d "${HOME_DIRS_PATH}$/{USERNAME}" ] ; then
         echo "Cannot create home directory, it already exists..."
         exit 1
 fi
 
-cp -r /etc/skel ${HOME_DIR_PATH}${USERNAME}
-chown -R ${USERNAME}:${USERNAME} ${HOME_DIR_PATH}${USERNAME}
-chmod -R 751 ${HOME_DIR_PATH}${USERNAME}
+cp -r /etc/skel "${HOME_DIRS_PATH}/${USERNAME}"
+chown -R ${USERNAME}:${USERNAME} "${HOME_DIRS_PATH}/${USERNAME}"
+chmod -R 751 "${HOME_DIRS_PATH}/${USERNAME}"
