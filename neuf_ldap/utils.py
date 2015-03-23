@@ -79,7 +79,7 @@ def create_ldap_user(user, dry_run=False):
         'last_name': user['last_name'],
         'full_name': full_name,
         'display_name': full_name,
-        'gecos': full_name,
+        'gecos': user['username'],
         'email': user['email'],
         'username': user['username'],
         'id': _get_next_uid(),
@@ -131,6 +131,9 @@ def ldap_update_user_details(inside_user, dry_run=False):
     for attr in diff_attributes:
         setattr(ldap_user, attr, inside_user[attr])
 
+    if ldap_user.username != inside_user['username']:
+        ldap_user.gecos = inside_user['username']
+
     name_changed = inside_user['first_name'] != ldap_user.first_name or inside_user['last_name'] != ldap_user.last_name
     if name_changed:
         full_name = '{} {}'.format(inside_user['first_name'], inside_user['last_name'])
@@ -139,7 +142,6 @@ def ldap_update_user_details(inside_user, dry_run=False):
             'last_name': inside_user['last_name'],
             'full_name': full_name,
             'display_name': full_name,
-            'gecos': full_name,
         }
         for key, value in name_data.iteritems():
             setattr(ldap_user, key, value)
