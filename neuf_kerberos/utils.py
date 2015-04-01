@@ -47,7 +47,7 @@ def set_kerberos_password(username, raw_password):
     if error:
         # Can not init with KDC?
         # KADM5_AUTH_MODIFY (requires the modify privilege)
-        logger.error(error)
+        logger.warning(error)
 
 
 def format_krb5_date(date):
