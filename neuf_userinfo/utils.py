@@ -12,7 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def add_new_user(user):
+def add_new_user_sync(user):
     """
         - Create new user in LDAP (username, first_name, last_name, email)
         - Add to groups (usergroup, dns-alle), it not exists, create

@@ -1,6 +1,6 @@
 # Installation
 
-    apt-get install libldap2-dev python-dev libmysqlclient-dev libsasl2-dev libldap2-dev libssl-dev ldap-utils
+    apt-get install libldap2-dev python-dev libmysqlclient-dev libsasl2-dev libldap2-dev libssl-dev ldap-utils redis-server
     virtualenv venv
     . venv/bin/activate
     pip install -r requirements.txt

@@ -18,7 +18,8 @@ import logging
 
 from inside.models import InsideUser
 from neuf_userinfo.forms import NewUserForm
-from neuf_userinfo.utils import add_new_user
+from neuf_userinfo.tasks import add_new_user
+from neuf_userinfo.utils import add_new_user_sync
 
 logger = logging.getLogger(__name__)
 
@@ -125,7 +126,11 @@ class AddNewUserView(View):
 
         user = form.cleaned_data
         logger.debug('Adding user \'{}\'.'.format(user['username']))
-        add_new_user(user)
+
+        if settings.INSIDE_USERSYNC_RUN_SYNC:
+            add_new_user_sync(user)
+        else:
+            add_new_user.delay(user)  # Async
 
         return JsonResponse({'results': 'success'})
 

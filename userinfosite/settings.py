@@ -144,9 +144,9 @@ EMAIL_PORT = 25
 DEFAULT_FROM_EMAIL = 'noreply@neuf.no'
 
 AUTHENTICATION_BACKENDS = (
-    # 'inside.authentication.InsideBackend',
-    'neuf_userinfo.backends.LDAPEmailBackend',
-    'neuf_userinfo.backends.LDAPUsernameBackend',
+    'inside.authentication.InsideBackend',
+    # 'neuf_userinfo.backends.LDAPEmailBackend',
+    # 'neuf_userinfo.backends.LDAPUsernameBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 # No cleaningladies.
@@ -209,8 +209,10 @@ INSIDE_USER_FLAGS_SYNC = {
     # "is_superuser": "edbadmin"
 }
 INSIDE_GROUPS_SYNC_DELETE = True  # When user logs in, groups are synced (locally in Django), this deletes aswell
+
 INSIDE_USERSYNC_API_KEY = ''
 INSIDE_USERSYNC_ENC_KEY = ''
+INSIDE_USERSYNC_RUN_SYNC = True
 
 # Home dir
 FILESERVER_HOST = "localhost"
@@ -231,6 +233,13 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
     'PAGINATE_BY': 10
 }
+
+# CELERY SETTINGS
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
 
 try:
     from local_settings import *
