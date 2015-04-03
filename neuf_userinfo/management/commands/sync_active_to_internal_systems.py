@@ -46,9 +46,6 @@ class Command(BaseCommand):
         # Do actual sync
         self.sync_users(inside_users_diffable, ldap_users_diffable)
 
-        # Are any LDAP users stale?
-        self.stale_ldap_users(inside_users_diffable, ldap_users_diffable)
-
         self.log_totals()
 
         # Voila!
@@ -124,12 +121,6 @@ class Command(BaseCommand):
                 self.COUNTS['in_sync'] += 1
                 if int(self.options['verbosity']) == 3:
                     self.stdout.write('[OK] Inside user {} is in sync with LDAP'.format(username))
-
-    def stale_ldap_users(self, inside_users_diffable, ldap_users_diffable):
-        for username, u in ldap_users_diffable.iteritems():
-            if username not in inside_users_diffable:
-                if int(self.options['verbosity']) >= 2:
-                    self.stdout.write('LDAP user {} is not in list of to-be-synced users from Inside'.format(username))
 
     def log_totals(self):
         if self.COUNTS['create'] > 0 or self.COUNTS['update'] > 0 or int(self.options['verbosity']) >= 2:
