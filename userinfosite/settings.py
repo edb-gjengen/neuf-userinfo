@@ -212,7 +212,7 @@ INSIDE_GROUPS_SYNC_DELETE = True  # When user logs in, groups are synced (locall
 
 INSIDE_USERSYNC_API_KEY = ''
 INSIDE_USERSYNC_ENC_KEY = ''
-INSIDE_USERSYNC_RUN_SYNC = True
+INSIDE_USERSYNC_RUN_SYNC = False
 
 # Home dir
 FILESERVER_HOST = "localhost"
