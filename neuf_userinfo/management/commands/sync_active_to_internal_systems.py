@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 
@@ -36,6 +37,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.options = options
+        if int(self.options['verbosity']) >= 2:
+            self.stdout.write('[{}] Started sync job'.format(datetime.utcnow()))
 
         # Get all active user from Inside
         inside_users_diffable = self.get_inside_users_diffable()
@@ -47,6 +50,9 @@ class Command(BaseCommand):
         self.sync_users(inside_users_diffable, ldap_users_diffable)
 
         self.log_totals()
+
+        if int(self.options['verbosity']) >= 2:
+            self.stdout.write('[{}] Finished sync job'.format(datetime.utcnow()))
 
         # Voila!
 
