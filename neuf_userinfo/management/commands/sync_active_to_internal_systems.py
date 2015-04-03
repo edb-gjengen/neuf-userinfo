@@ -133,7 +133,7 @@ class Command(BaseCommand):
                 # Compare set of group names
                 if set(inside_user[attr]) != set(ldap_user[attr]):
                     if int(self.options['verbosity']) >= 2:
-                        self.stdout.write('{}: {} != {}'.format(
+                        self.stdout.write('{}: {} (Inside) != {} (LDAP)'.format(
                             inside_user['username'],
                             ','.join(set(inside_user[attr])),
                             ','.join(set(ldap_user[attr]))))
@@ -141,7 +141,7 @@ class Command(BaseCommand):
             else:
                 if inside_user[attr] != ldap_user[attr]:
                     if int(self.options['verbosity']) >= 2:
-                        self.stdout.write('{}: {} != {}'.format(
+                        self.stdout.write('{}: {} (Inside) != {} (LDAP)'.format(
                             inside_user['username'],
                             inside_user[attr],
                             ldap_user[attr]))
