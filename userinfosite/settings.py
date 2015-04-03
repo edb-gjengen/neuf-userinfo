@@ -203,16 +203,16 @@ KERBEROS_ADMIN_PRINCIPAL = 'brukerinfo'
 KERBEROS_PASSWORD = ''
 
 # Inside
-INSIDE_USER_FLAGS_SYNC = {
+INSIDE_AUTH_USER_FLAGS_SYNC = {
     "is_active": "dns-alle",
     # "is_staff": "edb",
     # "is_superuser": "edbadmin"
 }
-INSIDE_GROUPS_SYNC_DELETE = True  # When user logs in, groups are synced (locally in Django), this deletes aswell
+INSIDE_AUTH_GROUPS_SYNC_DELETE = True  # When user logs in, groups are synced (locally in Django), this deletes aswell
 
 INSIDE_USERSYNC_API_KEY = ''
 INSIDE_USERSYNC_ENC_KEY = ''
-INSIDE_USERSYNC_RUN_SYNC = False
+INSIDE_USERSYNC_RUN_SYNCHRONOUS = False
 
 # Home dir
 FILESERVER_HOST = "localhost"

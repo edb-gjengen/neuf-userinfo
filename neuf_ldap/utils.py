@@ -125,14 +125,9 @@ def create_ldap_user(user, dry_run=False):
 
 def ldap_update_user_details(inside_user, dry_run=False):
     from neuf_ldap.models import LdapUser
-    diff_attributes = ['username', 'email', 'groups']
     ldap_user = LdapUser.objects.get(username=inside_user['username'])
 
-    for attr in diff_attributes:
-        setattr(ldap_user, attr, inside_user[attr])
-
-    if ldap_user.username != inside_user['username']:
-        ldap_user.gecos = inside_user['username']
+    ldap_user.email = inside_user['email']
 
     name_changed = inside_user['first_name'] != ldap_user.first_name or inside_user['last_name'] != ldap_user.last_name
     if name_changed:
@@ -149,6 +144,29 @@ def ldap_update_user_details(inside_user, dry_run=False):
     if not dry_run:
         ldap_user.save()
     logger.debug('User details updated for {}'.format(inside_user['username']))
+
+
+def ldap_update_user_groups(inside_user, ldap_user_diffable, dry_run=False, delete_group_memberships=False):
+    from neuf_ldap.models import LdapUser, LdapGroup
+    ldap_user = LdapUser.objects.get(username=inside_user['username'])
+
+    missing_groups = set(inside_user['groups']).difference(set(ldap_user_diffable['groups']))
+    stale_groups = set(ldap_user_diffable['groups']).difference(set(inside_user['groups']))
+
+    if not dry_run:
+        for g in LdapGroup.objects.filter(name__in=missing_groups):
+            g.members.append(ldap_user.username)
+            g.save()
+        if delete_group_memberships:
+            for g in LdapGroup.objects.filter(name__in=stale_groups):
+                g.members.remove(ldap_user.username)
+                g.save()
+
+    if len(missing_groups) > 0:
+        logger.debug('User groups added: {}'.format(','.join(missing_groups)))
+
+    if len(stale_groups) > 0 and delete_group_memberships:
+        logger.debug('User groups removed: {}'.format(','.join(stale_groups)))
 
 
 def create_ldap_automount(username, dry_run=False):

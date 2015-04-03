@@ -3,7 +3,7 @@ from django.db.models import Q
 
 from inside.models import InsideGroup, InsideUser
 from neuf_ldap.models import LdapGroup, LdapUser
-from neuf_ldap.utils import create_ldap_user, ldap_update_user_details, create_ldap_automount
+from neuf_ldap.utils import create_ldap_user, ldap_update_user_details, create_ldap_automount, ldap_update_user_groups
 
 from optparse import make_option
 from neuf_userinfo.ssh import create_home_dir
@@ -12,17 +12,24 @@ ACTIVE_USERS_GROUP = 'dns-aktiv'
 
 
 class Command(BaseCommand):
-    help = 'Syncs users in group dns-aktiv from Inside to LDAP'
+    help = 'Synchronizes users in group dns-aktiv from Inside to LDAP'
     option_list = BaseCommand.option_list + (
         make_option(
             '--dry-run',
             action='store_true',
             dest='dry_run',
             default=False,
-            help='Dry run of syncronization, nothing is saved.'
+            help='Dry run when syncronizing, does not save anything.'
+        ),
+        make_option(
+            '--delete-group-memberships',
+            action='store_true',
+            dest='delete_group_memberships',
+            default=False,
+            help='Toggle if group memberships syncronization should delete or not'
         ),)
 
-    DIFF_ATTRIBUTES = ['first_name', 'last_name', 'email', 'groups']
+    DIFF_ATTRIBUTES = ['first_name', 'last_name', 'email']
     SYNC_GROUP_PREFIX = 'dns-'
     COUNTS = dict(create=0, update=0, in_sync=0)
     options = {}
@@ -100,9 +107,14 @@ class Command(BaseCommand):
                 self.COUNTS['create'] += 1
                 if int(self.options['verbosity']) >= 2:
                     self.stdout.write('[CREATED] Inside user {} is not in LDAP'.format(username))
-            elif not self.user_details_in_sync(user, ldap_users_diffable[username]):
+            elif not self.user_details_in_sync(user, ldap_users_diffable[username]) or not self.user_groups_in_sync(user, ldap_users_diffable[username]):
                 # Update
                 ldap_update_user_details(user, dry_run=self.options['dry_run'])
+                ldap_update_user_groups(
+                    user,
+                    ldap_users_diffable[username],
+                    dry_run=self.options['dry_run'],
+                    delete_group_memberships=self.options['delete_group_memberships'])
 
                 self.COUNTS['update'] += 1
                 if int(self.options['verbosity']) >= 2:
@@ -120,31 +132,32 @@ class Command(BaseCommand):
                     self.stdout.write('LDAP user {} is not in list of to-be-synced users from Inside'.format(username))
 
     def log_totals(self):
-        if self.COUNTS['create'] != 0:
-            self.stdout.write('{} Inside users not found in LDAP'.format(self.COUNTS['create']))
-        if self.COUNTS['update'] != 0:
-            self.stdout.write('{} LDAP users were updated with new details'.format(self.COUNTS['update']))
-        if int(self.options['verbosity']) >= 2:
-            self.stdout.write('{} Inside users in sync with LDAP users '.format(self.COUNTS['in_sync']))
+        if self.COUNTS['create'] > 0 or self.COUNTS['update'] > 0 or int(self.options['verbosity']) >= 2:
+            self.stdout.write('Totals: created {}, updated {}, in sync: {}.'.format(
+                self.COUNTS['create'],
+                self.COUNTS['update'],
+                self.COUNTS['in_sync']))
 
     def user_details_in_sync(self, inside_user, ldap_user):
         for attr in self.DIFF_ATTRIBUTES:
-            if attr == 'groups':
-                # Compare set of group names
-                if set(inside_user[attr]) != set(ldap_user[attr]):
-                    if int(self.options['verbosity']) >= 2:
-                        self.stdout.write('{}: {} (Inside) != {} (LDAP)'.format(
-                            inside_user['username'],
-                            ','.join(set(inside_user[attr])),
-                            ','.join(set(ldap_user[attr]))))
-                    return False
-            else:
-                if inside_user[attr] != ldap_user[attr]:
-                    if int(self.options['verbosity']) >= 2:
-                        self.stdout.write('{}: {} (Inside) != {} (LDAP)'.format(
-                            inside_user['username'],
-                            inside_user[attr],
-                            ldap_user[attr]))
-                    return False
+            if inside_user[attr] != ldap_user[attr]:
+                if int(self.options['verbosity']) >= 2:
+                    self.stdout.write('{}: {} (Inside) != {} (LDAP)'.format(
+                        inside_user['username'],
+                        inside_user[attr],
+                        ldap_user[attr]))
+                return False
+
+        return True
+
+    def user_groups_in_sync(self, inside_user, ldap_user):
+        # Compare set of group names
+        if set(inside_user['groups']) != set(ldap_user['groups']):
+            if int(self.options['verbosity']) >= 2:
+                self.stdout.write('{}: {} (Inside) != {} (LDAP)'.format(
+                    inside_user['username'],
+                    ','.join(set(inside_user['groups'])),
+                    ','.join(set(ldap_user['groups']))))
+            return False
 
         return True
