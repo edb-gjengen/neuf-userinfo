@@ -22,12 +22,13 @@ def add_new_user_sync(user):
         - Create kerberos principal and set password
         - Set RADIUS password
     """
+    # FIXME: Remove after sync_active_to_internal_systems is enabled
     if not create_ldap_user(user):
         logger.debug('Could not create user \'{}\'.'.format(user['username']))
         return
 
-    create_home_dir(user['username'])
-    create_ldap_automount(user['username']),
+    create_home_dir(user['username'])  # FIXME: Remove after sync_active_to_internal_systems is enabled
+    create_ldap_automount(user['username'])  # FIXME: Remove after sync_active_to_internal_systems is enabled
 
     # Requires raw password
     add_kerberos_principal(user['username'], user['password'])
