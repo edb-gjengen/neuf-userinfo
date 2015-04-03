@@ -62,7 +62,7 @@ class InsideBackend(object):
             g, created = Group.objects.get_or_create(name=group)
             self.user.groups.add(g)
 
-        if not settings.INSIDE_GROUPS_SYNC_DELETE:
+        if not settings.INSIDE_AUTH_GROUPS_SYNC_DELETE:
             return
 
         # Remove old relationships
@@ -71,7 +71,7 @@ class InsideBackend(object):
                 self.user.groups.remove(g)
 
     def _update_user_flags(self):
-        flag_to_group = settings.INSIDE_USER_FLAGS_SYNC
+        flag_to_group = settings.INSIDE_AUTH_USER_FLAGS_SYNC
         user_groups = self.user.groups.values_list('name', flat=True)
         for flag, group in flag_to_group.iteritems():
             if group in user_groups:
