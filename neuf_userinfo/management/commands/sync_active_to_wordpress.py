@@ -12,7 +12,6 @@ class Command(BaseCommand):
     help = 'Syncs users from LDAP to our Wordpress installations'
 
     def handle(self, *args, **options):
-        # TODO rewrite to use InsideUser and InsideGroup
         active_members = LdapGroup.objects.get(name="dns-aktiv").members
         active_users = LdapUser.objects.filter(username__in=active_members)
         users_out = [[u.username, u.first_name, u.last_name, u.email] for u in active_users]
