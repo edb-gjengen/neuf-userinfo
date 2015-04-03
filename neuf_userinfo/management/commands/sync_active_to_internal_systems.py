@@ -133,7 +133,7 @@ class Command(BaseCommand):
 
     def log_totals(self):
         if self.COUNTS['create'] > 0 or self.COUNTS['update'] > 0 or int(self.options['verbosity']) >= 2:
-            self.stdout.write('Totals: created {}, updated {}, in sync: {}.'.format(
+            self.stdout.write('Totals: created {}, updated {}, in sync: {}'.format(
                 self.COUNTS['create'],
                 self.COUNTS['update'],
                 self.COUNTS['in_sync']))
@@ -152,12 +152,19 @@ class Command(BaseCommand):
 
     def user_groups_in_sync(self, inside_user, ldap_user):
         # Compare set of group names
-        if set(inside_user['groups']) != set(ldap_user['groups']):
-            if int(self.options['verbosity']) >= 2:
+        inside_groups = set(inside_user['groups'])
+        ldap_groups = set(ldap_user['groups'])
+        if self.options['delete_group_memberships']:
+            in_sync = inside_groups == ldap_groups
+            if not in_sync and int(self.options['verbosity']) >= 2:
                 self.stdout.write('{}: {} (Inside) != {} (LDAP)'.format(
                     inside_user['username'],
-                    ','.join(set(inside_user['groups'])),
-                    ','.join(set(ldap_user['groups']))))
-            return False
+                    ','.join(inside_groups),
+                    ','.join(ldap_groups)))
+        else:
+            missing_groups = inside_groups.difference(ldap_groups)
+            in_sync = len(missing_groups) == 0
+            if not in_sync and int(self.options['verbosity']) >= 2:
+                self.stdout.write('{}: Missing groups in LDAP: {}'.format(','.join(missing_groups)))
 
-        return True
+        return in_sync

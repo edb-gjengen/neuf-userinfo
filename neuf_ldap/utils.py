@@ -163,10 +163,10 @@ def ldap_update_user_groups(inside_user, ldap_user_diffable, dry_run=False, dele
                 g.save()
 
     if len(missing_groups) > 0:
-        logger.debug('User groups added: {}'.format(','.join(missing_groups)))
+        logger.debug('Group memberships added: {}'.format(','.join(missing_groups)))
 
     if len(stale_groups) > 0 and delete_group_memberships:
-        logger.debug('User groups removed: {}'.format(','.join(stale_groups)))
+        logger.debug('Group memberships removed: {}'.format(','.join(stale_groups)))
 
 
 def create_ldap_automount(username, dry_run=False):
