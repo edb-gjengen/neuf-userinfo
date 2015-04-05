@@ -127,7 +127,7 @@ class AddNewUserView(View):
         user = form.cleaned_data
         logger.debug('Adding user \'{}\'.'.format(user['username']))
 
-        if settings.INSIDE_USERSYNC_RUN_SYNC:
+        if settings.INSIDE_USERSYNC_RUN_SYNCHRONOUS:
             add_new_user_sync(user)
         else:
             add_new_user.delay(user)  # Async
