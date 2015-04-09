@@ -60,7 +60,10 @@ class Command(BaseCommand):
         inside_users_diffable = {}
         group = InsideGroup.objects.get(posix_group=ACTIVE_USERS_GROUP)
         inside_users = InsideUser.objects.filter(group_rels__group=group)
-        inside_users = inside_users.exclude(Q(ldap_username__isnull=True) | Q(registration_status='partial'))
+        inside_users = inside_users.exclude(
+            Q(ldap_username__isnull=True)
+            | Q(registration_status='partial')
+            | Q(ldap_password__isnull=True))
 
         for u in inside_users:
             inside_groups = InsideGroup.objects.filter(user_rels__user=u).exclude(posix_group='')
