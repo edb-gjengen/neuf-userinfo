@@ -15,4 +15,4 @@ class Command(BaseCommand):
             ldap_password = ldap_user_passwords.get(u.ldap_username)
             if ldap_password is not None:
                 u.ldap_password = ldap_password
-                u.save()
+                u.save(update_fields=['ldap_password'])
