@@ -19,7 +19,7 @@ def get_kerberos_principal(username):
         # Can not init with KDC?
         # KADM5_UNK_PRINC (principal does not exist)
         # KADM5_AUTH_GET (requires the get (inquire) privilege)
-        logger.error(error)
+        logger.warning(error)
         return None
 
     cleaned_output = {}
