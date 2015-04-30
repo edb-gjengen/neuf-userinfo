@@ -102,7 +102,7 @@ def create_ldap_user(user, dry_run=False):
 
     if not dry_run:
         ldap_user.save()
-    logger.debug('User saved with data: {} and password type \'{}\'.'.format( pprint.pformat(user_data), pwd_type))
+    logger.debug('User saved with data: {} and password type \'{}\'.'.format(pprint.pformat(user_data), pwd_type))
 
     # Add user group
     ldap_user_group = LdapGroup(name=user['username'], gid=user_data['group'], members=[user['username']])

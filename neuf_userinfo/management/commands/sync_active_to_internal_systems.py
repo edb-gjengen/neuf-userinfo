@@ -43,8 +43,8 @@ class Command(BaseCommand):
         # Get all active user from Inside
         inside_users_diffable = self.get_inside_users_diffable()
 
-        # Get existing users in LDAP
-        ldap_users_diffable = self.get_ldap_users_diffable()
+        # Get all existing users in LDAP
+        ldap_users_diffable = self.get_all_ldap_users_diffable()
 
         # Do actual sync
         self.sync_users(inside_users_diffable, ldap_users_diffable)
@@ -81,10 +81,9 @@ class Command(BaseCommand):
 
         return inside_users_diffable
 
-    def get_ldap_users_diffable(self):
+    def get_all_ldap_users_diffable(self):
         ldap_users_diffable = {}
-        ldap_active_members = LdapGroup.objects.get(name=ACTIVE_USERS_GROUP).members
-        ldap_users = LdapUser.objects.filter(username__in=ldap_active_members)
+        ldap_users = LdapUser.objects.all()
 
         for u in ldap_users:
             ldap_groups = LdapGroup.objects\
@@ -165,6 +164,8 @@ class Command(BaseCommand):
             missing_groups = inside_groups.difference(ldap_groups)
             in_sync = len(missing_groups) == 0
             if not in_sync and int(self.options['verbosity']) >= 2:
-                self.stdout.write('{}: Missing groups in LDAP: {}'.format(','.join(missing_groups)))
+                self.stdout.write('{}: Missing groups in LDAP: {}'.format(
+                    inside_user['username'],
+                    ','.join(missing_groups)))
 
         return in_sync
