@@ -47,7 +47,7 @@ class Command(BaseCommand):
         inside_users = inside_users.exclude(
             Q(ldap_username__isnull=True)
             | Q(registration_status='partial')
-            | Q(ldap_password__isnull=True)).values_list('username', flat=True)
+            | Q(ldap_password__isnull=True)).values_list('ldap_username', flat=True)
 
         if self.options['verbosity'] == '3':
             self.stdout.write('Found {} Inside users'.format(len(inside_users)))

@@ -45,9 +45,13 @@ def get_home_dirs():
     host_string = '{}@{}'.format(settings.FILESERVER_SSH_USER, settings.FILESERVER_HOST)
     fabric_settings = _get_fabric_settings(host_string)
 
+    separator = '\r\n{}'.format(settings.FILESERVER_HOME_PATH)
+    if settings.FILESERVER_HOME_PATH[-1] != '/':
+        separator = '{}/'.format(separator)
+
     with fab_settings(**fabric_settings):
         with hide('running', 'stdout', 'stderr'):
             homedirs_str = run('find {} -maxdepth 1 -type d'.format(settings.FILESERVER_HOME_PATH))
-            homedirs = homedirs_str.split('\r\n{}'.format(settings.FILESERVER_HOME_PATH))[1:]
+            homedirs = homedirs_str.split(separator)[1:]
 
     return homedirs
