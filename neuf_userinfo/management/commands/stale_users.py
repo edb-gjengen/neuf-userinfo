@@ -9,7 +9,7 @@ from optparse import make_option
 
 
 class Command(BaseCommand):
-    help = 'List stale LDAP users not in group dns-aktiv from Inside'
+    help = 'List stale LDAP users not in the Inside group dns-aktiv'
     option_list = BaseCommand.option_list + (
         make_option(
             '--exclude-existing',
@@ -21,7 +21,6 @@ class Command(BaseCommand):
     )
 
     ACTIVE_USERS_GROUP = 'dns-aktiv'
-    SYNC_GROUP_PREFIX = 'dns-'
     options = {}
 
     def handle(self, *args, **options):
