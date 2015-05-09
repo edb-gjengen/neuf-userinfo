@@ -60,7 +60,7 @@ class Command(BaseCommand):
         if self.options['exclude_existing']:
             ldap_active_members = LdapGroup.objects.get(name=self.ACTIVE_USERS_GROUP).members
             ldap_users = ldap_users.exclude(username__in=ldap_active_members)
-        ldap_users.values_list('username', flat=True)
+        ldap_users = ldap_users.values_list('username', flat=True)
 
         if self.options['verbosity'] == '3':
             self.stdout.write('Found {} LDAP users'.format(len(ldap_users)))
