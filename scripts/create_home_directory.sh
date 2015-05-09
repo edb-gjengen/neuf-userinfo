@@ -14,7 +14,7 @@ fi
 HOME_DIRS_PATH=$1
 USERNAME=$2
 
-if ! id -u $USERNAME; then
+if ! id -u ${USERNAME} &>/dev/null; then
         echo "Cannot find user ${USERNAME}. Be sure the user is added to the ldap directory before running this script."
         exit 1
 fi

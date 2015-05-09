@@ -4,9 +4,7 @@ import base64
 import logging
 
 from neuf_kerberos.utils import add_kerberos_principal
-from neuf_ldap.utils import create_ldap_user, create_ldap_automount
 from neuf_radius.utils import create_radius_user
-from neuf_userinfo.ssh import create_home_dir
 import rijndael
 
 logger = logging.getLogger(__name__)
@@ -14,25 +12,9 @@ logger = logging.getLogger(__name__)
 
 def add_new_user_sync(user):
     """
-        Currently does the following:
         - Create kerberos principal and set password
         - Create/set RADIUS user and password
-
-        Previously (before 2015-04-03) did the following:
-        - Create new user in LDAP (username, first_name, last_name, email)
-        - Add to groups (usergroup, dns-alle), it not exists, create
-        - Set LDAP password
-        - Create homedir on fileserver
-        - Create automount entry
-        Note: Now handled by userinfo command sync_active_to_internal_systems
     """
-    # if not create_ldap_user(user):
-    #     logger.debug('Could not create user \'{}\'.'.format(user['username']))
-    #     return
-    #
-    # create_home_dir(user['username'])
-    # create_ldap_automount(user['username'])
-
     # Requires raw password
     add_kerberos_principal(user['username'], user['password'])
     create_radius_user(user['username'], user['password'])
