@@ -8,7 +8,8 @@ from neuf_ldap.models import LdapUser, LdapGroup, LdapAutomountHome
 
 
 class Command(BaseCommand):
-    help = "Takes a list of usernames separated by newlines and removes matching users (with associated data) from LDAP"
+    args = 'filename'
+    help = "Takes a file with a newline separated list of usernames and removes matching users (with associated data) from LDAP"
     option_list = BaseCommand.option_list + (
         make_option(
             '--dry-run',
@@ -26,8 +27,6 @@ class Command(BaseCommand):
         ),
     )
 
-    ACTIVE_USERS_GROUP = 'dns-aktiv'
-    SYNC_GROUP_PREFIX = 'dns-'
     options = {}
 
     def handle(self, *args, **options):
@@ -44,7 +43,7 @@ class Command(BaseCommand):
         with open(filename) as f:
             usernames = f.read().strip().split()
             self.stdout.write('Found {} usernames in file'.format(len(usernames)))
-            # READ file with usernames
+
             ldap_users = LdapUser.objects.filter(username__in=usernames)
             self.stdout.write('Matched {} PosixUser objects'.format(ldap_users.count()))
             for user in ldap_users:
