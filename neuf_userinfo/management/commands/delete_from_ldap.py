@@ -70,16 +70,16 @@ class Command(BaseCommand):
         if groups_with_memberships.count() == 0:
             return
 
-        self.stdout.write('Removing \'{}\' membership in groups: {}'.format(
+        self.stdout.write('Listing \'{}\' group memberships: {}'.format(
             username,
             ', '.join(groups_with_memberships.values_list('name', flat=True))))
 
-        if self._user_confirmes_deletion(username, 'PosixGroup membership for'):
+        if self._user_confirmes_deletion(username, 'all PosixGroup memberships for'):
             for g in groups_with_memberships:
                 if not self.options['dry_run']:
                     g.members.remove(username)
                     g.save()
-                    self.stdout.write('Removed PosixGroup membership in {} for \'{}\''.format(g.name, username))
+                self.stdout.write('Removed PosixGroup membership in {} for \'{}\''.format(g.name, username))
 
         else:
             self.stdout.write('Did nothing with \'{}\' membership in groups:'.format(
