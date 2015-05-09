@@ -3,6 +3,7 @@ from fabric.api import settings as fab_settings
 from fabric.context_managers import hide
 from fabric.operations import sudo, run
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -55,3 +56,12 @@ def get_home_dirs():
             homedirs = homedirs_str.split(separator)[1:]
 
     return homedirs
+
+
+def homedir_exists(username):
+    host_string = '{}@{}'.format(settings.FILESERVER_SSH_USER, settings.FILESERVER_HOST)
+    fabric_settings = _get_fabric_settings(host_string)
+
+    with fab_settings(**fabric_settings):
+        with hide('running', 'stdout', 'stderr'):
+            return run('ls {} &>/dev/null'.format(os.path.join(settings.FILESERVER_HOME_PATH, username)))
