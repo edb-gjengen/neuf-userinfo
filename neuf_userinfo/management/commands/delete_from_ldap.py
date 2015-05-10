@@ -66,6 +66,7 @@ class Command(BaseCommand):
         return confirmed
 
     def delete_group_memberships(self, username):
+        # FIXME: Horribly inefficient
         groups_with_memberships = LdapGroup.objects.filter(members__contains=username)
         if groups_with_memberships.count() == 0:
             return
