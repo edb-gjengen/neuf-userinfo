@@ -115,7 +115,7 @@ def password_reset_confirm(request, uidb64=None, token=None,
 class AddNewUserView(View):
 
     def get(self, request):
-        """ Adds a new user to all our internal services. See .utils.add_new_user for details. """
+        """ Adds a new user to our internal services. See .utils.add_new_user for details. """
 
         if not self.validate_api_key(request.GET.get('api_key', '')):
             return JsonResponse({'errors': 'Invalid api_key'})
