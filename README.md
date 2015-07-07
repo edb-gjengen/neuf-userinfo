@@ -5,7 +5,7 @@
     . venv/bin/activate
     pip install -r requirements.txt
     cp userinfosite/settings-sample.py userinfosite/settings.py
-    python manage.py syncdb
+    python manage.py migrate
     python manage.py runserver
 
 ## LDAP
@@ -26,7 +26,7 @@ For simple dev you need at least:
 
 ## RADIUS
     # create the radius database tables, if they don't exist already:
-    python manage.py syncdb --database=radius
+    python manage.py migrate --database=radius
 
 ## Homedirs
  - settings.FILESERVER_HOST:~/.ssh/authorized_keys must contain the public key of settings.FILESERVER_USER
