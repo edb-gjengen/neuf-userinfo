@@ -118,11 +118,11 @@ class AddNewUserView(View):
         """ Adds a new user to our internal services. See .utils.add_new_user for details. """
 
         if not self.validate_api_key(request.GET.get('api_key', '')):
-            return JsonResponse({'errors': 'Invalid api_key'}, status=400)
+            return JsonResponse({'errors': 'Invalid api_key'})
 
         form = NewUserForm(request.GET)
         if not form.is_valid():
-            return JsonResponse({'errors': form.errors}, status=400)
+            return JsonResponse({'errors': form.errors})
 
         user = form.cleaned_data
         logger.debug('Adding user \'{}\'.'.format(user['username']))

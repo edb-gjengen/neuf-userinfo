@@ -44,14 +44,15 @@ def encrypt_rijndael(key, plaintext):
     for start in range(0, len(padded_text), BLOCK_SIZE):
         ciphertext += r.encrypt(padded_text[start:start+BLOCK_SIZE])
 
-    encoded = base64.b64encode(ciphertext.encode('utf-8'))
+    encoded = base64.b64encode(ciphertext)
 
     return encoded
 
 
 def decrypt_rijndael(key, encoded):
     padded_key = key.ljust(KEY_SIZE, '\0')
-    ciphertext = base64.b64decode(encoded).decode('utf-8')
+
+    ciphertext = base64.b64decode(encoded)
 
     r = rijndael.rijndael(padded_key, BLOCK_SIZE)
 
