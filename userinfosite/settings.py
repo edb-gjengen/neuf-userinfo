@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 Django settings for this project.
 
@@ -9,6 +10,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from __future__ import unicode_literals
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 

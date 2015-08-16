@@ -27,7 +27,6 @@ If any strings are of the wrong length a ValueError is thrown
 # an intellectual property claim against the reference
 # code, in which case it can be made public domain by
 # deleting all the comments and renaming all the variables
-
 import copy
 import string
 
@@ -311,7 +310,7 @@ class rijndael:
             result.append((S[(t[(i + s1) % BC] >> 16) & 0xFF] ^ (tt >> 16)) & 0xFF)
             result.append((S[(t[(i + s2) % BC] >>  8) & 0xFF] ^ (tt >>  8)) & 0xFF)
             result.append((S[ t[(i + s3) % BC]        & 0xFF] ^  tt       ) & 0xFF)
-        return ''.join(map(chr, result))
+        return u''.join(map(unichr, result))
 
     def decrypt(self, ciphertext):
         if len(ciphertext) != self.block_size:
@@ -354,7 +353,7 @@ class rijndael:
             result.append((Si[(t[(i + s1) % BC] >> 16) & 0xFF] ^ (tt >> 16)) & 0xFF)
             result.append((Si[(t[(i + s2) % BC] >>  8) & 0xFF] ^ (tt >>  8)) & 0xFF)
             result.append((Si[ t[(i + s3) % BC]        & 0xFF] ^  tt       ) & 0xFF)
-        return ''.join(map(chr, result))
+        return u''.join(map(unichr, result))
 
 def encrypt(key, block):
     return rijndael(key, len(block)).encrypt(block)

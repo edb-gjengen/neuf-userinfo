@@ -159,4 +159,5 @@ class NewUserForm(forms.Form):
         # Rename firstname to first_name and lastname to last_name
         cleaned_data['first_name'] = cleaned_data.pop('firstname')
         cleaned_data['last_name'] = cleaned_data.pop('lastname')
+
         return cleaned_data
