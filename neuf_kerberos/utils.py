@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import datetime
 from django.conf import settings
 import logging
@@ -77,6 +78,7 @@ def add_kerberos_principal(username, password, dry_run=False):
             # KADM5_PASS_Q_* (password quality violations)
             logger.error(error)
             return False
+
     logger.debug('Added kerberos principal {}'.format(principal))
 
     return True
