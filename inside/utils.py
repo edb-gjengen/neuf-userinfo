@@ -37,6 +37,6 @@ def set_inside_password(username, raw_password):
 
     user.password = hashed_password
     user.ldap_password = ldap_hashed_password
-    user.save()
+    user.save(update_fields=['password', 'ldap_password'])
 
     log_inside_userupdate(username, "Satt passord på nytt via brukerinfo.neuf.no.")
