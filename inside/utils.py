@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from django.db import connections
 import logging
 from neuf_ldap.utils import ldap_create
 from passlib.hash import mysql41

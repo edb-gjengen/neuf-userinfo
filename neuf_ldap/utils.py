@@ -27,7 +27,7 @@ def set_ldap_password(username, raw_password):
         user = LdapUser.objects.get(username=username)
         user.set_password(raw_password)
     except LdapUser.DoesNotExist:
-        # Ignore
+        logger.warning('Could not set password in LDAP for user with username {}'.format(username))
         pass
 
 
