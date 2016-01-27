@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from datetime import datetime
 from django.core.management.base import BaseCommand
 from django.db.models import Q
