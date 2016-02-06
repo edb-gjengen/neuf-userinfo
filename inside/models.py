@@ -336,7 +336,7 @@ class InsideUser(models.Model):
     connection_name = 'inside'
 
     cardno = models.IntegerField(unique=True, blank=True, null=True)
-    username = models.CharField(unique=True, max_length=12)
+    # username = models.CharField(unique=True, max_length=12)
     password = models.CharField(max_length=50)
     first_name = models.CharField(max_length=120, db_column='firstname')
     last_name = models.CharField(max_length=120, db_column='lastname')
@@ -361,6 +361,16 @@ class InsideUser(models.Model):
 
     # ugly hack to use django internals for password reset
     last_login = datetime.datetime(2001, 1, 1)
+
+    def username(self):
+        """
+        Django's password reset feature uses this field internally,
+        when we pass in a InsideUser in place of standard Django User.
+
+        Note: The username db field is legacy, it can contain non ASCII data not suitable for *nix services.
+        This simply uses the ldap_username field instead, which should only contain valid usernames.
+        """
+        return self.ldap_username
 
     def __unicode__(self):
         if not self.ldap_username:
