@@ -362,6 +362,7 @@ class InsideUser(models.Model):
     # ugly hack to use django internals for password reset
     last_login = datetime.datetime(2001, 1, 1)
 
+    @property
     def username(self):
         """
         Django's password reset feature uses this field internally,
