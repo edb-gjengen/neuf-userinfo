@@ -42,7 +42,8 @@ class NeufSetPasswordForm(SetPasswordForm):
 
         # Active services
         set_radius_password(username, password)  # creates user if non-existant
-        set_ldap_password(username, password)
+        if ldap_username_exists(username):
+            set_ldap_password(username, password)
 
         if has_kerberos_principal(username):
             set_kerberos_password(username, password)

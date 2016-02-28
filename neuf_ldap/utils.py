@@ -34,13 +34,13 @@ def set_ldap_password(username, raw_password):
 def ldap_user_group_exists(username):
     from neuf_ldap.models import LdapGroup
 
-    return len(LdapGroup.objects.filter(name=username)) != 0
+    return LdapGroup.objects.filter(name=username).exists()
 
 
 def ldap_username_exists(username):
     from neuf_ldap.models import LdapUser
 
-    return len(LdapUser.objects.filter(username=username)) != 0
+    return LdapUser.objects.filter(username=username).exists()
 
 
 def create_ldap_user(user, dry_run=False):
