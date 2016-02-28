@@ -1,11 +1,5 @@
 """
-Django settings for this project.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/1.6/topics/settings/
-
-For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.6/ref/settings/
+Ref: https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -101,18 +95,12 @@ DATABASES = {
         'PASSWORD': 'toor',
     },
     'radius': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'dev_radius',
-        'USER': 'dev',
-        'PASSWORD': 'dev',
-        'HOST': 'localhost',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'radius-db.sqlite3'),
     },
     'inside': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'dev_inside',
-        'USER': 'dev',
-        'PASSWORD': 'dev',
-        'HOST': 'localhost',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'inside-db.sqlite3'),
     }
 }
 DATABASE_ROUTERS = ['neuf_userinfo.router.Router']
@@ -145,57 +133,11 @@ DEFAULT_FROM_EMAIL = 'noreply@neuf.no'
 
 AUTHENTICATION_BACKENDS = (
     'inside.authentication.InsideBackend',
-    # 'neuf_userinfo.backends.LDAPEmailBackend',
-    # 'neuf_userinfo.backends.LDAPUsernameBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 # No cleaningladies.
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_AGE = 60 * 15  # in seconds
-
-# LDAP server URI and BIND_DN, same as db-settings
-AUTH_LDAP_U_SERVER_URI = DATABASES['ldap']['NAME']
-AUTH_LDAP_U_BIND_DN = DATABASES['ldap']['USER']
-AUTH_LDAP_U_BIND_PASSWORD = DATABASES['ldap']['PASSWORD']
-
-import ldap
-from django_auth_ldap.config import LDAPSearch, PosixGroupType
-
-# Basic user auth
-AUTH_LDAP_U_USER_SEARCH = LDAPSearch(LDAP_USER_DN, ldap.SCOPE_ONELEVEL, "(uid=%(user)s)")
-# Basic groups
-AUTH_LDAP_U_GROUP_SEARCH = LDAPSearch(LDAP_GROUP_DN, ldap.SCOPE_ONELEVEL, "(objectClass=posixGroup)")
-AUTH_LDAP_U_GROUP_TYPE = PosixGroupType()
-# Mirror groups on each auth
-AUTH_LDAP_U_MIRROR_GROUPS = True
-# Group to user flag mappings
-AUTH_LDAP_U_USER_FLAGS_BY_GROUP = {
-    "is_active": "cn=dns-alle,{}".format(LDAP_GROUP_DN),
-    "is_staff": "cn=edb,{}".format(LDAP_GROUP_DN),
-    "is_superuser": "cn=edbadmin,{}".format(LDAP_GROUP_DN)
-}
-# User attribute mappings
-AUTH_LDAP_U_USER_ATTR_MAP = {
-    "first_name": "givenName",
-    "last_name": "sn",
-    "email": "mail",
-}
-# Allways update the django user object on authentication.
-AUTH_LDAP_U_ALWAYS_UPDATE_USER = True
-
-# Email LDAP auth
-AUTH_LDAP_E_SERVER_URI = AUTH_LDAP_U_SERVER_URI
-AUTH_LDAP_E_BIND_DN = AUTH_LDAP_U_BIND_DN
-AUTH_LDAP_E_BIND_PASSWORD = AUTH_LDAP_U_BIND_PASSWORD
-
-AUTH_LDAP_E_USER_SEARCH = LDAPSearch(LDAP_USER_DN, ldap.SCOPE_ONELEVEL, "(mail=%(user)s)")
-
-AUTH_LDAP_E_GROUP_SEARCH = AUTH_LDAP_U_GROUP_SEARCH
-AUTH_LDAP_E_GROUP_TYPE = AUTH_LDAP_U_GROUP_TYPE
-AUTH_LDAP_E_MIRROR_GROUPS = AUTH_LDAP_U_MIRROR_GROUPS
-AUTH_LDAP_E_USER_FLAGS_BY_GROUP = AUTH_LDAP_U_USER_FLAGS_BY_GROUP
-AUTH_LDAP_E_USER_ATTR_MAP = AUTH_LDAP_U_USER_ATTR_MAP
-AUTH_LDAP_E_ALWAYS_UPDATE_USER = AUTH_LDAP_U_ALWAYS_UPDATE_USER
 
 # Kerberos realm
 KERBEROS_REALM = "NEUF.NO"

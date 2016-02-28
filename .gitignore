@@ -1,6 +1,6 @@
 *.swp
 *.pyc
-db.sqlite3
+*.sqlite3
 static/style/.sass-cache/
 local_settings.py
 venv
