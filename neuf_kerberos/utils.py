@@ -7,6 +7,12 @@ from subprocess import Popen, PIPE
 
 logger = logging.getLogger(__name__)
 
+KADMIN_DATE_FORMAT = '%a %b %d %H:%M:%S %Z %Y'
+
+
+def parse_kadmin_result(output):
+    return dict(re.findall(r'([\w ]*): (.+)', output))
+
 
 def get_kerberos_principal(username):
     principal = "{}@{}".format(username, settings.KERBEROS_REALM)
@@ -23,12 +29,7 @@ def get_kerberos_principal(username):
         logger.warning(error)
         return None
 
-    cleaned_output = {}
-    match = re.findall(r'([\w ]*): (.+)', output)
-    for key, value in match:
-        cleaned_output[key] = value
-
-    return cleaned_output
+    return parse_kadmin_result(output)
 
 
 def has_kerberos_principal(username):
@@ -52,8 +53,8 @@ def set_kerberos_password(username, raw_password):
 
 def format_krb5_date(date):
     try:
-        formatted_date = datetime.datetime.strptime(date, '%a %b %d %H:%M:%S %Z %Y')
-        formatted_date = formatted_date.strftime('%Y-%m-%d %H:%M:%S')
+        formatted_date = datetime.datetime.strptime(date, KADMIN_DATE_FORMAT)
+        formatted_date = formatted_date.isoformat()
     except ValueError:
         formatted_date = 'never'
     return formatted_date
