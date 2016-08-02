@@ -16,7 +16,6 @@ from inside.models import InsideUser
 from inside.utils import set_inside_password
 
 from neuf_kerberos.utils import set_kerberos_password, has_kerberos_principal
-from neuf_radius.utils import set_radius_password
 from neuf_ldap.utils import set_ldap_password, ldap_username_exists, ldap_user_group_exists
 from neuf_userinfo.utils import decrypt_rijndael
 from neuf_userinfo.validators import UsernameValidator, validate_password
@@ -41,7 +40,10 @@ class NeufSetPasswordForm(SetPasswordForm):
         set_inside_password(username, password)
 
         # Active services
-        set_radius_password(username, password)  # creates user if non-existant
+        if 'neuf_radius' in settings.INSTALLED_APPS:
+            from neuf_radius.utils import set_radius_password
+            set_radius_password(username, password)  # creates user if non-existant
+
         if ldap_username_exists(username):
             set_ldap_password(username, password)
 

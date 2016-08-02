@@ -35,7 +35,7 @@ INSTALLED_APPS += (
     'rest_framework',
     'neuf_userinfo',
     'neuf_ldap',
-    'neuf_radius',
+    # 'neuf_radius',  # Not in use
     'neuf_kerberos',
     'inside',
 )

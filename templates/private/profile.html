@@ -19,7 +19,7 @@
         <div class="well">
             <ul>
                 <li><span id="sso">Felles innlogging (DNS-konto)</span></li>
-                <li><span id="wireless_status">Trådløst nettverk</span></li>
+                <li><span id="wireless_status">Trådløst nettverk (neuf-wifi)</span></li>
                 <li><span id="client_status">Foreningsmaskiner</span></li>
             </ul>
         </div>
@@ -70,7 +70,7 @@
             }
             $("#client_status").append(image).prop('title', title).attr('data-content', data_content).popover();
         });
-        $.getJSON("/userstatus/wireless/?format=json&username="+username, function(data) {
+        /*$.getJSON("/userstatus/wireless/?format=json&username="+username, function(data) {
             if(data.active) {
                 image = img_check;
                 title = 'Du har tilgang til trådløst nettverk';
@@ -86,7 +86,12 @@
                 data_content = 'Du har ikke en trådløskonto i Radius.';
             }
             $("#wireless_status").append(image).prop('title', title).attr('data-content', data_content).popover();
-        });
+        });*/
+
+        /* Radius is not in use, show info about SSID with PSK */
+        title = 'Du har tilgang til trådløst nettverk';
+        data_content = 'Spør andre aktive eller i Glassbaren om passord til neuf-wifi';
+        $("#wireless_status").append(img_check).prop('title', title).attr('data-content', data_content).popover();
 
         $.getJSON("/ldap/users/"+username+"/")
         .done(function(data) {
