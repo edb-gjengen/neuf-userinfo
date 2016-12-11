@@ -47,7 +47,10 @@ foreach($users as $user) {
         if($wp_user->user_email != $email) {
             _log("[$site_name][update] $wp_user->ID : replaced $wp_user->user_email with $email");
             $wp_user->user_email = $email;
-            wp_insert_user($wp_user);
+            $user_id = wp_insert_user($wp_user);
+            if ( is_wp_error($user_id) ) {
+                _log("[$site_name][error] ".$user_id->get_error_message()."(username: $username)");
+            }
         }
     }
 }
