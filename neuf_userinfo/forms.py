@@ -1,5 +1,4 @@
 # coding: utf-8
-from __future__ import unicode_literals
 from django.conf import settings
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator

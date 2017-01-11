@@ -43,7 +43,7 @@ class Radcheck(models.Model):
     op = models.CharField(max_length=6)
     value = models.CharField(max_length=759)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.username
 
     class Meta:

@@ -1,11 +1,10 @@
 # coding: utf-8
-from __future__ import unicode_literals
 import base64
 import logging
 
 from neuf_kerberos.utils import add_kerberos_principal
 from neuf_radius.utils import create_radius_user
-import rijndael
+from neuf_userinfo import rijndael
 
 logger = logging.getLogger(__name__)
 
@@ -33,10 +32,10 @@ def encrypt_rijndael(key, plaintext):
     padded_text = plaintext + (BLOCK_SIZE - len(plaintext) % BLOCK_SIZE) * '\0'
 
     # could also be one of
-    #if len(plaintext) % BLOCK_SIZE != 0:
-    #    padded_text = plaintext.ljust((len(plaintext) / BLOCK_SIZE) + 1 * BLOCKSIZE), '\0')
+    # if len(plaintext) % BLOCK_SIZE != 0:
+    #     padded_text = plaintext.ljust((len(plaintext) / BLOCK_SIZE) + 1 * BLOCKSIZE), '\0')
     # -OR-
-    #padded_text = plaintext.ljust((len(plaintext) + (BLOCK_SIZE - len(plaintext) % BLOCK_SIZE)), '\0')
+    # padded_text = plaintext.ljust((len(plaintext) + (BLOCK_SIZE - len(plaintext) % BLOCK_SIZE)), '\0')
 
     r = rijndael.rijndael(padded_key, BLOCK_SIZE)
 

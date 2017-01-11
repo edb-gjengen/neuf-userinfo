@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import logging
 from neuf_ldap.utils import ldap_create
 from passlib.hash import mysql41

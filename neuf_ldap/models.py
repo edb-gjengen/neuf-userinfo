@@ -71,7 +71,10 @@ class LdapUser(ldapdb.models.Model):
     def check_password(self, raw_password):
         return ldap_validate(raw_password, self.password)
 
-    def __unicode__(self):
+    class Meta:
+        managed = False
+
+    def __str__(self):
         return self.username
 
 
@@ -89,7 +92,10 @@ class LdapGroup(ldapdb.models.Model):
     name = CharField(db_column='cn', max_length=200, primary_key=True)
     members = ListField(db_column='memberUid')
 
-    def __unicode__(self):
+    class Meta:
+        managed = False
+
+    def __str__(self):
         return self.name
 
 
@@ -107,7 +113,10 @@ class LdapAutomountMap(ldapdb.models.Model):
 
     ou = CharField(db_column='ou', primary_key=True)  # F.ex auto.home
 
-    def __unicode__(self):
+    class Meta:
+        managed = False
+
+    def __str__(self):
         return self.ou
 
 
@@ -135,5 +144,8 @@ class LdapAutomountHome(ldapdb.models.Model):
 
         self.automountInformation = krb5_automount_info
 
-    def __unicode__(self):
+    class Meta:
+        managed = False
+
+    def __str__(self):
         return self.username

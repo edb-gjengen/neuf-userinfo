@@ -29,7 +29,6 @@ If any strings are of the wrong length a ValueError is thrown
 # deleting all the comments and renaming all the variables
 
 import copy
-import string
 
 shifts = [[[0, 0], [1, 3], [2, 2], [3, 1]],
           [[0, 0], [1, 5], [2, 4], [3, 3]],
@@ -131,6 +130,7 @@ for i in range(4):
     for j in range(4):
         iG[i][j] = AA[i][j + 4]
 
+
 def mul4(a, bs):
     if a == 0:
         return 0
@@ -196,6 +196,7 @@ del mul
 del mul4
 del cox
 del iG
+
 
 class rijndael:
     def __init__(self, key, block_size = 16):
@@ -356,11 +357,14 @@ class rijndael:
             result.append((Si[ t[(i + s3) % BC]        & 0xFF] ^  tt       ) & 0xFF)
         return ''.join(map(chr, result))
 
+
 def encrypt(key, block):
     return rijndael(key, len(block)).encrypt(block)
 
+
 def decrypt(key, block):
     return rijndael(key, len(block)).decrypt(block)
+
 
 def test():
     def t(kl, bl):

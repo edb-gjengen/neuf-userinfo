@@ -1,8 +1,7 @@
 # coding: utf-8
-from __future__ import unicode_literals
-
 from django.db import models
 import datetime
+
 
 class Action(models.Model):
     connection_name = 'inside'
@@ -125,7 +124,7 @@ class InsideGroup(models.Model):
     mailinglist = models.CharField(max_length=50)
     posix_group = models.CharField(max_length=128)
 
-    def __unicode__(self):
+    def __str__(self):
         if self.posix_group == '':
             return self.name
 
@@ -373,7 +372,7 @@ class InsideUser(models.Model):
         """
         return self.ldap_username
 
-    def __unicode__(self):
+    def __str__(self):
         if not self.ldap_username:
             return 'User {}'.format(self.pk)
 
@@ -387,7 +386,7 @@ class InsideUser(models.Model):
 class UserAddressInt(models.Model):
     connection_name = 'inside'
 
-    user = models.ForeignKey('inside.InsideUser', primary_key=True)
+    user = models.OneToOneField('inside.InsideUser', primary_key=True)
     street = models.CharField(max_length=255)
     zipcode = models.CharField(max_length=10)
     city = models.CharField(max_length=50)
@@ -402,7 +401,7 @@ class UserAddressInt(models.Model):
 class UserAddressNo(models.Model):
     connection_name = 'inside'
 
-    user = models.ForeignKey('inside.InsideUser', primary_key=True)
+    user = models.OneToOneField('inside.InsideUser', primary_key=True)
     street = models.CharField(max_length=255)
     zipcode = models.ForeignKey('inside.PostalCode', db_column='zipcode')
 
@@ -425,7 +424,7 @@ class UserGroupRelationship(models.Model):
 class UserPhoneNumber(models.Model):
     connection_name = 'inside'
 
-    user = models.ForeignKey('inside.InsideUser', primary_key=True)
+    user = models.OneToOneField('inside.InsideUser', primary_key=True)
     number = models.CharField(max_length=16)
     validated = models.IntegerField()
 
