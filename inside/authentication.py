@@ -73,7 +73,7 @@ class InsideBackend(object):
     def _update_user_flags(self):
         flag_to_group = settings.INSIDE_AUTH_USER_FLAGS_SYNC
         user_groups = self.user.groups.values_list('name', flat=True)
-        for flag, group in flag_to_group.iteritems():
+        for flag, group in flag_to_group.items():
             if group in user_groups:
                 setattr(self.user, flag, True)
             else:

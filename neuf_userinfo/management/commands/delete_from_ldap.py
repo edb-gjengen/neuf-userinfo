@@ -57,7 +57,7 @@ class Command(BaseCommand):
         if self.options['no_prompt']:
             return True
 
-        val = raw_input('Do you want to permanently remove {} \'{}\'? [y/N]'.format(object_type, username))
+        val = input('Do you want to permanently remove {} \'{}\'? [y/N]'.format(object_type, username))
         try:
             confirmed = distutils.util.strtobool(val)
         except ValueError:

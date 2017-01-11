@@ -24,13 +24,13 @@ class Router(object):
         return None
 
     def db_for_read(self, model, **hints):
-        "Point all operations on models connection_name to db=connection_name"
+        """Point all operations on models connection_name to db=connection_name"""
         if is_routed_model(model):
             return model.connection_name
         return None
 
     def db_for_write(self, model, **hints):
-        "Point all operations on models connection_name to db=connection_name"
+        """Point all operations on models connection_name to db=connection_name"""
         if is_routed_model(model):
             return model.connection_name
         return None

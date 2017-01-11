@@ -102,7 +102,7 @@ class Command(BaseCommand):
         return ldap_users_diffable
 
     def sync_users(self, inside_users_diffable, ldap_users_diffable):
-        for username, user in inside_users_diffable.iteritems():
+        for username, user in inside_users_diffable.items():
             if username not in ldap_users_diffable:
                 # Create
                 create_ldap_user(user, dry_run=self.options['dry_run'])

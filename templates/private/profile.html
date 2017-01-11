@@ -30,7 +30,7 @@
             <ul>
             {% if groups %}
                 {% for group in groups %}
-                    {% if group = "dns-aktiv" %}
+                    {% if group == "dns-aktiv" %}
                         <li title="Du har tilgang til foreningsmaskinene.">{{ group }}</li>
                     {% else %}
                         <li>{{ group }}</li>

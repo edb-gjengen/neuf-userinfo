@@ -30,6 +30,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'django_extensions',
 )
 INSTALLED_APPS += (
@@ -93,10 +94,6 @@ DATABASES = {
         'NAME': 'ldap://localhost/',
         'USER': 'cn=admin,dc=neuf,dc=no',
         'PASSWORD': 'toor',
-    },
-    'radius': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'radius-db.sqlite3'),
     },
     'inside': {
         'ENGINE': 'django.db.backends.sqlite3',

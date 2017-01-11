@@ -137,7 +137,7 @@ def ldap_update_user_details(inside_user, dry_run=False):
             'full_name': full_name,
             'display_name': full_name,
         }
-        for key, value in name_data.iteritems():
+        for key, value in name_data.items():
             setattr(ldap_user, key, value)
 
     if not dry_run:
