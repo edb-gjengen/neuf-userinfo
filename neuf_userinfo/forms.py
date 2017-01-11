@@ -39,10 +39,6 @@ class NeufSetPasswordForm(SetPasswordForm):
         set_inside_password(username, password)
 
         # Active services
-        if 'neuf_radius' in settings.INSTALLED_APPS:
-            from neuf_radius.utils import set_radius_password
-            set_radius_password(username, password)  # creates user if non-existant
-
         if ldap_username_exists(username):
             set_ldap_password(username, password)
 

@@ -3,7 +3,6 @@ import base64
 import logging
 
 from neuf_kerberos.utils import add_kerberos_principal
-from neuf_radius.utils import create_radius_user
 from neuf_userinfo import rijndael
 
 logger = logging.getLogger(__name__)
@@ -16,7 +15,6 @@ def add_new_user_sync(user):
     """
     # Requires raw password
     add_kerberos_principal(user['username'], user['password'])
-    create_radius_user(user['username'], user['password'])
 
 """
 Rijndael stuff, thank you SO!
