@@ -38,12 +38,14 @@ def has_kerberos_principal(username):
 
 def set_kerberos_password(username, raw_password):
     principal = "{}@{}".format(username, settings.KERBEROS_REALM)
-    kadmin_query = " -p {} -w {} -q 'change_password -pw {} {}'".format(
-        settings.KERBEROS_ADMIN_PRINCIPAL,
-        settings.KERBEROS_PASSWORD,
-        raw_password,
-        principal)
-    p = Popen('kadmin' + kadmin_query, shell=True, stdout=PIPE, stderr=PIPE)
+    kadmin_query = 'change_password -pw {} {}'.format(raw_password, principal)
+    kadmin_params = [
+        '-p', settings.KERBEROS_ADMIN_PRINCIPAL,
+        '-w', settings.KERBEROS_PASSWORD,
+        '-q', kadmin_query]
+    cmd = ['kadmin'] + kadmin_params
+
+    p = Popen(cmd, stdout=PIPE, stderr=PIPE)
     output, error = p.communicate()
     if error:
         # Can not init with KDC?
