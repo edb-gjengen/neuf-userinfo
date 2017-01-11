@@ -5,7 +5,7 @@ from django.contrib.auth.forms import SetPasswordForm, AuthenticationForm
 from django.contrib.auth import login, logout as auth_logout
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponseRedirect, JsonResponse
 from django.http.response import HttpResponseNotFound
 from django.shortcuts import resolve_url, render, get_object_or_404
@@ -13,6 +13,7 @@ from django.template.response import TemplateResponse
 from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
+from django.views.generic import FormView
 from django.views.generic import View
 import logging
 
@@ -24,19 +25,14 @@ from neuf_userinfo.utils import add_new_user_sync
 logger = logging.getLogger(__name__)
 
 
-def index(request):
-    if request.method == "POST":
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            # Log the user in.
-            login(request, form.get_user())
-    else:
-        if request.user.is_authenticated():
-            return HttpResponseRedirect(reverse('my-profile'))
-        else:
-            form = AuthenticationForm(request)
+class IndexView(FormView):
+    form_class = AuthenticationForm
+    success_url = reverse_lazy('my-profile')
+    template_name = 'public/index.html'
 
-    return render(request, 'public/index.html', {'form': form})
+    def form_valid(self, form):
+        login(self.request, form.get_user())
+        return super().form_valid(form)
 
 
 @login_required
