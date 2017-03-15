@@ -16,12 +16,8 @@ def parse_kadmin_result(output):
 
 def get_kerberos_principal(username):
     principal = "{}@{}".format(username, settings.KERBEROS_REALM)
-    kadmin_query = " -p '{}' -w {} -q 'get_principal {}'".format(
-        settings.KERBEROS_ADMIN_PRINCIPAL,
-        settings.KERBEROS_PASSWORD,
-        principal)
-    p = Popen('kadmin' + kadmin_query, shell=True, stdout=PIPE, stderr=PIPE)
-    output, error = p.communicate()
+    kadmin_query = "get_principal {}".format(principal)
+    output, error = _run_kadmin_query(kadmin_query)
     if error:
         # Can not init with KDC?
         # KADM5_UNK_PRINC (principal does not exist)
@@ -39,18 +35,22 @@ def has_kerberos_principal(username):
 def set_kerberos_password(username, raw_password):
     principal = "{}@{}".format(username, settings.KERBEROS_REALM)
     kadmin_query = 'change_password -pw {} {}'.format(raw_password, principal)
+    output, error = _run_kadmin_query(kadmin_query)
+    if error:
+        # Can not init with KDC?
+        # KADM5_AUTH_MODIFY (requires the modify privilege)
+        logger.warning(error)
+
+
+def _run_kadmin_query(kadmin_query):
     kadmin_params = [
         '-p', settings.KERBEROS_ADMIN_PRINCIPAL,
         '-w', settings.KERBEROS_PASSWORD,
         '-q', kadmin_query]
     cmd = ['kadmin'] + kadmin_params
-
     p = Popen(cmd, stdout=PIPE, stderr=PIPE)
-    output, error = p.communicate()
-    if error:
-        # Can not init with KDC?
-        # KADM5_AUTH_MODIFY (requires the modify privilege)
-        logger.warning(error)
+
+    return p.communicate()
 
 
 def format_krb5_date(date):
@@ -64,15 +64,12 @@ def format_krb5_date(date):
 
 def add_kerberos_principal(username, password, dry_run=False):
     principal = "{}@{}".format(username, settings.KERBEROS_REALM)
-    kadmin_query = " -p {} -w {} -q 'add_principal -policy default -pw {} {}'".format(
-        settings.KERBEROS_ADMIN_PRINCIPAL,
-        settings.KERBEROS_PASSWORD,
+    kadmin_query = "add_principal -policy default -pw {} {}".format(
         password,
         principal)
 
     if not dry_run:
-        p = Popen('kadmin' + kadmin_query, shell=True, stdout=PIPE, stderr=PIPE)
-        output, error = p.communicate()
+        output, error = _run_kadmin_query(kadmin_query)
         if error:
             # KADM5_AUTH_ADD (requires "add" privilege)
             # KADM5_BAD_MASK (shouldn't happen)
