@@ -32,7 +32,7 @@ class InsideBackend(object):
             self.user = User.objects.get(username=self.inside_user.ldap_username)
         except User.DoesNotExist:
             # Create a new user.
-            self.user = User(username=self.inside_user.ldap_username, password=password)
+            self.user = User.objects.create_user(username=self.inside_user.ldap_username)
 
         # Sync detail and groups from Inside to local Django install (for display and permissions)
         self._update_user_details()
