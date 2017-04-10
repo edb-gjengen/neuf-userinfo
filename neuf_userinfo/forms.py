@@ -10,6 +10,7 @@ from django import forms
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from inside.models import InsideUser
@@ -63,8 +64,8 @@ class NeufSetPasswordForm(SetPasswordForm):
     def clean(self):
         if self.user.username is None:
             url = '<a href="https://inside.studentersamfundet.no/sms/register.php">her</a>'
-            raise ValidationError(
-                'Du må fullføre registrering av medlemskapet ditt før du kan bytte passord. Det gjør du {url}.'.format(url=url))
+            msg = 'Du må fullføre registrering av medlemskapet ditt før du kan bytte passord. Det gjør du {url}.'
+            raise ValidationError(mark_safe(msg.format(url=url)))
 
         return super(NeufSetPasswordForm, self).clean()
 
