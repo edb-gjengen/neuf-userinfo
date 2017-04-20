@@ -63,9 +63,11 @@ class NeufSetPasswordForm(SetPasswordForm):
 
     def clean(self):
         if self.user.username is None:
-            url = '<a href="https://inside.studentersamfundet.no/sms/register.php">her</a>'
-            msg = 'Du må fullføre registrering av medlemskapet ditt før du kan bytte passord. Det gjør du {url}.'
-            raise ValidationError(mark_safe(msg.format(url=url)))
+            email = '<a href="mailto:kak-edb@studentersamfundet.no">kak-edb@studentersamfundet.no</a>'
+            msg = 'Du må fullføre aktivering av medlemskapet ditt før du kan bytte passord. {url}. ' \
+                  'Du skal ha fått en epost fra oss med en aktiveringskode. ' \
+                  'Hvis du ikke finner denne kan du ta kontakt på {email}.'
+            raise ValidationError(mark_safe(msg.format(email=email)))
 
         return super(NeufSetPasswordForm, self).clean()
 
